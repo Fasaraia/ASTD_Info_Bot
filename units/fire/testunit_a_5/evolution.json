@@ -1,0 +1,8 @@
+{
+  "requirements": {
+    "materials": {"fire_shard": 3},
+    "conditions": {"kills": 5000}
+  },
+  "image": "assets/placeholder.png",
+  "thumbnail": "assets/placeholder.png"
+}

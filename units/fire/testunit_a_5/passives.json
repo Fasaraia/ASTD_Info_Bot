@@ -1,0 +1,9 @@
+[
+  {
+    "name": "Heat Aura",
+    "description": "Nearby units gain +5% attack speed.",
+    "cooldown": null,
+    "global_cd": null,
+    "tags": ["self-buff", "aura"]
+  }
+]

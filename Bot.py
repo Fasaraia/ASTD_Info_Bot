@@ -22,7 +22,7 @@ log = logging.getLogger("tdsinfobot")
 INITIAL_COGS = [
     "cogs.Units",
     # "cogs.admin",
-    # "cogs.gamemodes",
+    "cogs.Gamemodes",
     # "cogs.mechanics",
     # "cogs.misc",
 ]

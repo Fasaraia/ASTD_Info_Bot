@@ -1,11 +1,11 @@
 """
-Typed wrappers around the raw dicts data_loader returns.
+Typed wrappers around the raw dicts DataLoader returns.
 
 Usage:
-    from core import data_loader, models
+    from core import DataLoader, Models
 
-    raw = data_loader.get_unit("unit_a")
-    unit = models.Unit.from_raw(raw)
+    raw = DataLoader.get_unit("unit_a")
+    unit = Models.Unit.from_raw(raw)
     print(unit.name, unit.abilities[0].name)
 """
 
@@ -77,7 +77,7 @@ class Evolution:
         return cls(
             requirements=EvolutionRequirements.from_raw(raw.get("requirements", {})),
             image=raw.get("image"),
-            thumbnail=raw.get("thumbnail")
+            thumbnail=raw.get("thumbnail"),
         )
 
 
@@ -195,5 +195,66 @@ class Orb:
             obtain_method=raw.get("obtain_method", ""),
             unit_specific=raw.get("unit_specific"),
             granted_ability=Ability.from_raw(granted) if granted else None,
+            image=raw.get("image"),
+        )
+
+
+@dataclass
+class GamemodeStage:
+    id: str
+    name: str
+    description: str
+    reward_currencies: dict[str, int]
+    reward_materials: dict[str, int]
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "GamemodeStage":
+        rewards = raw.get("rewards", {}) or {}
+        return cls(
+            id=raw.get("id", ""),
+            name=raw.get("name", "Unknown Stage"),
+            description=raw.get("description", ""),
+            reward_currencies=rewards.get("currencies", {}) or {},
+            reward_materials=rewards.get("materials", {}) or {},
+            image=raw.get("image"),
+        )
+
+
+@dataclass
+class StoryDrop:
+    name: str
+    range: tuple[int, int]
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "StoryDrop":
+        drop_range = raw.get("range", [0, 0])
+        return cls(
+            name=raw.get("name", ""),
+            range=(drop_range[0], drop_range[-1]),
+        )
+
+
+@dataclass
+class StoryChapter:
+    stage_number: int
+    name: str
+    enchant: str | None
+    act_range: tuple[int, int]
+    drops: list[StoryDrop]
+    description: str = ""
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "StoryChapter":
+        act_range = raw.get("act_range", [0, 0])
+        drops = [StoryDrop.from_raw(d) for d in raw.get("drops", [])]
+        return cls(
+            stage_number=raw.get("stage_number", 0),
+            name=raw.get("name", "Unknown Stage"),
+            enchant=raw.get("enchant"),
+            act_range=(act_range[0], act_range[-1]),
+            drops=drops,
+            description=raw.get("description", ""),
             image=raw.get("image"),
         )

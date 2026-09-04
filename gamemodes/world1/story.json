@@ -1,0 +1,16 @@
+{
+  "chapters": [
+    {
+      "stage_number": 1,
+      "name": "Starter Plains",
+      "enchant": "fire",
+      "act_range": [1, 6],
+      "drops": [
+        {"name": "Novice Warrior", "range": [1, 3]},
+        {"name": "Flame Sprite", "range": [1, 2]}
+      ],
+      "description": "The very first stage of World 1.",
+      "image": "assets/gamemodes/w1_story_1.png"
+    }
+  ]
+}

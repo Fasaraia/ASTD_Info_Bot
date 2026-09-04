@@ -43,8 +43,19 @@ def _read_json(path: Path) -> Any:
     if not path.exists():
         log.warning("Missing data file: %s", path)
         return None
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        log.error(
+            "Invalid JSON in %s at line %d column %d: %s",
+            path,
+            e.lineno,
+            e.colno,
+            e.msg,
+        )
+        return None
 
 
 def _load_units() -> None:

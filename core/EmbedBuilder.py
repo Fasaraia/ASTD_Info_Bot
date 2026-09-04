@@ -24,6 +24,16 @@ ENCHANT_COLORS = {
     "light": discord.Color.gold(),
     "dark": discord.Color.dark_purple(),
 }
+
+ENCHANT_LETTERS = {
+    "fire": "F",
+    "nature": "N",
+    "earth": "E",
+    "wind": "W",
+    "dark": "D",
+    "holy": "H",
+}
+
 DEFAULT_COLOR = discord.Color.greyple()
 
 def _resolve_local_image(path: str | None) -> Path | None:
@@ -43,6 +53,24 @@ def image_file_for(path: str | None) -> discord.File | None:
     if resolved is None:
         return None
     return discord.File(resolved, filename=resolved.name)
+
+
+def image_files_for(*paths: str | None) -> list[discord.File]:
+    """Resolves several local image paths at once (e.g. an evolution's
+    image + thumbnail) into a list of discord.File, skipping anything
+    invalid and de-duplicating by filename so the same file is never
+    attached twice."""
+    files: list[discord.File] = []
+    seen_names: set[str] = set()
+
+    for path in paths:
+        resolved = _resolve_local_image(path)
+        if resolved is None or resolved.name in seen_names:
+            continue
+        seen_names.add(resolved.name)
+        files.append(discord.File(resolved, filename=resolved.name))
+
+    return files
 
 
 def _set_image(embed: discord.Embed, path: str | None) -> None:
@@ -160,4 +188,50 @@ def build_passive_embed(passive: Models.Passive, unit_name: str | None = None) -
         embed.add_field(name="Global Cooldown", value=f"{passive.global_cd}s", inline=True)
 
     # No image field for passives, per schema.
+    return embed
+
+def build_story_overview_embed(world_label: str, chapters: list[Models.StoryChapter]) -> discord.Embed:
+    """One line per chapter, e.g.:
+    22. Familiar Planet[F] (127-132) — Strong Alien Soldier 1-3
+    """
+    embed = discord.Embed(title=f"{world_label} Story Stages", color=DEFAULT_COLOR)
+ 
+    if not chapters:
+        embed.description = "No story stages on record yet."
+        return embed
+ 
+    lines = []
+    for ch in chapters:
+        letter = ENCHANT_LETTERS.get(ch.enchant.lower()) if ch.enchant else None
+        enchant_part = f"[{letter}]" if letter else ""
+        act_part = f"({ch.act_range[0]}-{ch.act_range[1]})"
+        drop_part = f"{ch.drop_name} {ch.drop_range[0]}-{ch.drop_range[1]}" if ch.drop_name else ""
+        lines.append(f"{ch.stage_number}. **{ch.name}**{enchant_part} {act_part} — {drop_part}")
+ 
+    embed.description = "\n".join(lines)
+    return embed
+ 
+ 
+def build_story_chapter_embed(world_label: str, chapter: Models.StoryChapter) -> discord.Embed:
+    title = f"{world_label} — {chapter.name}"
+    embed = discord.Embed(title=title, color=DEFAULT_COLOR)
+ 
+    if chapter.enchant:
+        embed.add_field(name="Enchant", value=chapter.enchant.title(), inline=True)
+ 
+    embed.add_field(
+        name="Acts", value=f"{chapter.act_range[0]}–{chapter.act_range[1]}", inline=True
+    )
+ 
+    if chapter.drop_name:
+        embed.add_field(
+            name="Drops",
+            value=f"{chapter.drop_name} {chapter.drop_range[0]}-{chapter.drop_range[1]}",
+            inline=True,
+        )
+ 
+    if chapter.description:
+        embed.description = chapter.description
+ 
+    _set_image(embed, chapter.image)
     return embed

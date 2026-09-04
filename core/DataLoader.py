@@ -6,12 +6,12 @@ cogs and models go through this module. That means if storage ever
 changes (JSON -> database, files move, etc.), only this file changes.
 
 Usage:
-    from core import data_loader
+    from core import DataLoader
 
-    unit = data_loader.get_unit("unit_a")
-    material = data_loader.get_material("fire_shard")
-    orb = data_loader.get_orb("orb_a")
-    stages = data_loader.get_gamemode_file("world1", "story")
+    unit = DataLoader.get_unit("unit_a")
+    material = DataLoader.get_material("fire_shard")
+    orb = DataLoader.get_orb("orb_a")
+    stages = DataLoader.get_gamemode_file("world1", "story")
 """
 
 import json
@@ -292,3 +292,37 @@ def find_units_by_status_effect(effect_id: str) -> list[dict]:
             })
 
     return results
+
+
+def find_ability_owner(ability_name: str) -> tuple[str, int] | None:
+    """
+    Case-insensitive exact match against every unit's ability names.
+    Returns (unit_id, ability_index) for the first match, or None.
+    Ability names are expected to be unique across all units.
+    """
+    _ensure_loaded()
+    target = ability_name.lower()
+
+    for unit_id, unit in _units.items():
+        for i, ability in enumerate(unit.get("abilities", [])):
+            if ability.get("name", "").lower() == target:
+                return unit_id, i
+
+    return None
+
+
+def find_passive_owner(passive_name: str) -> tuple[str, int] | None:
+    """
+    Case-insensitive exact match against every unit's passive names.
+    Returns (unit_id, passive_index) for the first match, or None.
+    Passive names are expected to be unique across all units.
+    """
+    _ensure_loaded()
+    target = passive_name.lower()
+
+    for unit_id, unit in _units.items():
+        for i, passive in enumerate(unit.get("passives", [])):
+            if passive.get("name", "").lower() == target:
+                return unit_id, i
+
+    return None

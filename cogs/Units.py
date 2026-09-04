@@ -1,11 +1,11 @@
 """
 Unit lookup commands (user-facing, prefix-based) + name-triggered lookup.
 
-Typing a unit's exact name (case-insensitive) in any channel triggers
-a lookup automatically -- no prefix needed. This currently sends a
-simple placeholder response so the trigger itself can be tested before
-the real embed/button/dropdown display is built (core/Models.py +
-core/EmbedBuilder.py, still to come).
+Typing ";<name>" triggers a lookup -- the name can be a unit's name
+(opens on the Base tab), an ability's name (opens directly on that
+ability, even if the owning unit has several), or a passive's name
+(same idea). Unit names are checked first, then abilities, then
+passives.
 """
 
 import logging
@@ -46,6 +46,19 @@ class Units(commands.Cog):
         latency_ms = round(self.bot.latency * 1000)
         await ctx.send(f"Pong! ({latency_ms}ms)")
 
+    async def _send_unit_view(self, channel, unit_id: str, initial_tab: str = "base", initial_index: int | None = None):
+        raw = DataLoader.get_unit(unit_id)
+        if raw is None:
+            log.warning("Unit '%s' is in the name index but has no data.", unit_id)
+            return
+
+        unit = Models.Unit.from_raw(raw)
+        view = UnitView(unit, initial_tab=initial_tab, initial_index=initial_index)
+        embed = view.initial_embed()
+        image_files = EmbedBuilder.image_files_for(*view.initial_image_paths())
+
+        await channel.send(embed=embed, view=view, files=image_files)
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
@@ -54,9 +67,9 @@ class Units(commands.Cog):
         valid_channels = (int(os.getenv("QUESTIONS_CHANNEL_ID")), int(os.getenv("COMMANDS_CHANNEL_ID")))
         if message.channel.id not in valid_channels:
             return
-        
+
         valid_roles = (role.id == int(os.getenv("VALID_ROLES")) for role in message.author.roles)
-        
+
         if not any(valid_roles) and message.channel.id == int(os.getenv("QUESTIONS_CHANNEL_ID")):
             return
 
@@ -65,27 +78,35 @@ class Units(commands.Cog):
         if not content.startswith(";"):
             return
 
-        name = content[1:].strip().lower()
+        name = content[1:].strip()
         if not name:
             return
 
-        unit_id = self._name_lookup.get(name)
-        if unit_id is None:
-            return  # not a recognized unit name, nothing to do
-
-        raw = DataLoader.get_unit(unit_id)
-        if raw is None:
-            log.warning("Unit '%s' is in the name index but has no data.", unit_id)
+        # 1. Unit name?
+        unit_id = self._name_lookup.get(name.lower())
+        if unit_id is not None:
+            await self._send_unit_view(message.channel, unit_id)
             return
 
-        unit = Models.Unit.from_raw(raw)
-        view = UnitView(unit)
-        image_file = EmbedBuilder.image_file_for(unit.thumbnail)
+        # 2. Ability name?
+        ability_match = DataLoader.find_ability_owner(name)
+        if ability_match is not None:
+            owner_unit_id, ability_index = ability_match
+            await self._send_unit_view(
+                message.channel, owner_unit_id, initial_tab="abilities", initial_index=ability_index
+            )
+            return
 
-        if image_file:
-            await message.channel.send(embed=view.initial_embed(), view=view, file=image_file)
-        else:
-            await message.channel.send(embed=view.initial_embed(), view=view)
+        # 3. Passive name?
+        passive_match = DataLoader.find_passive_owner(name)
+        if passive_match is not None:
+            owner_unit_id, passive_index = passive_match
+            await self._send_unit_view(
+                message.channel, owner_unit_id, initial_tab="passives", initial_index=passive_index
+            )
+            return
+
+        # No match on any of the three -- nothing to do.
 
 
 async def setup(bot: commands.Bot):

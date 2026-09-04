@@ -3,6 +3,11 @@ The interactive View attached to a unit lookup message: Base /
 Evolution / Abilities / Passives tab buttons, plus an adaptive
 selector for Abilities/Passives -- a plain button when there's only
 one entry, a dropdown (Select) when there are multiple.
+
+Supports opening directly to a specific ability/passive (used when a
+person triggers an ability/passive by its own name rather than the
+unit's name) -- the matching tab opens showing that entry immediately,
+with the dropdown (if present) pre-selected to it.
 """
 
 import discord
@@ -18,63 +23,72 @@ class TabButton(discord.ui.Button):
         self.parent_view = parent_view
 
     async def callback(self, interaction: discord.Interaction):
-        await self.parent_view.show_tab(interaction, self.tab_key)
+        # A plain tab click resets to that tab's default state -- no
+        # specific ability/passive pre-selected.
+        await self.parent_view.show_tab(interaction, self.tab_key, index=None)
 
 
 class AbilitySelect(discord.ui.Select):
-    def __init__(self, abilities: list[Models.Ability], parent_view: "UnitView"):
+    def __init__(self, abilities: list[Models.Ability], parent_view: "UnitView", selected_index: int | None):
         options = [
-            discord.SelectOption(label=a.name, value=str(i))
+            discord.SelectOption(label=a.name, value=str(i), default=(i == selected_index))
             for i, a in enumerate(abilities)
         ]
         super().__init__(placeholder="Choose an ability...", options=options)
-        self.abilities = abilities
         self.parent_view = parent_view
 
     async def callback(self, interaction: discord.Interaction):
-        ability = self.abilities[int(self.values[0])]
-        embed = EmbedBuilder.build_ability_embed(ability, self.parent_view.unit.name)
-        thumbnail = EmbedBuilder.image_file_for(ability.thumbnail)
-        attachments = [thumbnail] if thumbnail else []
-        await interaction.response.edit_message(embed=embed, view=self.parent_view, attachments=attachments)
+        idx = int(self.values[0])
+        await self.parent_view.show_tab(interaction, "abilities", index=idx)
 
 
 class PassiveSelect(discord.ui.Select):
-    def __init__(self, passives: list[Models.Passive], parent_view: "UnitView"):
+    def __init__(self, passives: list[Models.Passive], parent_view: "UnitView", selected_index: int | None):
         options = [
-            discord.SelectOption(label=p.name, value=str(i))
+            discord.SelectOption(label=p.name, value=str(i), default=(i == selected_index))
             for i, p in enumerate(passives)
         ]
         super().__init__(placeholder="Choose a passive...", options=options)
-        self.passives = passives
         self.parent_view = parent_view
 
     async def callback(self, interaction: discord.Interaction):
-        passive = self.passives[int(self.values[0])]
-        embed = EmbedBuilder.build_passive_embed(passive, self.parent_view.unit.name)
-        # Passives have no image field, but still clear any image left
-        # over from a previous tab.
-        await interaction.response.edit_message(embed=embed, view=self.parent_view, attachments=[])
+        idx = int(self.values[0])
+        await self.parent_view.show_tab(interaction, "passives", index=idx)
 
 
 class UnitView(discord.ui.View):
     """
-    Attach with: await message.channel.send(embed=..., view=UnitView(unit))
+    Attach with:
+        view = UnitView(unit)  # opens on the Base tab
+        await message.channel.send(embed=view.initial_embed(), view=view)
 
-    Call UnitView.initial_embed() to get the Base tab embed to send
-    alongside the view on first send.
+    To open directly on a specific ability/passive (name-triggered
+    lookup), pass initial_tab + initial_index:
+        view = UnitView(unit, initial_tab="abilities", initial_index=2)
     """
 
     TABS = [("Base", "base"), ("Evolution", "evolution"), ("Abilities", "abilities"), ("Passives", "passives")]
 
-    def __init__(self, unit: Models.Unit, timeout: float = 180):
+    def __init__(
+        self,
+        unit: Models.Unit,
+        initial_tab: str = "base",
+        initial_index: int | None = None,
+        timeout: float = 180,
+    ):
         super().__init__(timeout=timeout)
         self.unit = unit
-        self.active_tab = "base"
+        self.active_tab = initial_tab
+        self.active_index = initial_index
         self._rebuild_items()
 
     def initial_embed(self) -> discord.Embed:
-        return EmbedBuilder.build_unit_base_embed(self.unit)
+        embed, _ = self._build_display(self.active_tab, self.active_index)
+        return embed
+
+    def initial_image_paths(self) -> list[str | None]:
+        _, paths = self._build_display(self.active_tab, self.active_index)
+        return paths
 
     def _rebuild_items(self) -> None:
         self.clear_items()
@@ -84,59 +98,70 @@ class UnitView(discord.ui.View):
             self.add_item(TabButton(label, key, self, active=(key == self.active_tab)))
 
         if self.active_tab == "abilities" and len(self.unit.abilities) > 1:
-            self.add_item(AbilitySelect(self.unit.abilities, self))
+            self.add_item(AbilitySelect(self.unit.abilities, self, self.active_index))
         elif self.active_tab == "passives" and len(self.unit.passives) > 1:
-            self.add_item(PassiveSelect(self.unit.passives, self))
+            self.add_item(PassiveSelect(self.unit.passives, self, self.active_index))
 
-    async def show_tab(self, interaction: discord.Interaction, tab_key: str) -> None:
-        self.active_tab = tab_key
-        self._rebuild_items()
-
-        image_path: str | None = None
+    def _build_display(self, tab_key: str, index: int | None) -> tuple[discord.Embed, list[str | None]]:
+        """Returns (embed, image_paths) for a tab + optional specific
+        ability/passive index. image_paths may contain None entries --
+        EmbedBuilder.image_files_for() filters those out."""
 
         if tab_key == "base":
             embed = EmbedBuilder.build_unit_base_embed(self.unit)
-            image_path = self.unit.thumbnail
+            return embed, [self.unit.thumbnail]
 
-        elif tab_key == "evolution":
+        if tab_key == "evolution":
             embed = EmbedBuilder.build_unit_evolution_embed(self.unit)
-            image_path = self.unit.evolution.thumbnail if self.unit.evolution else None
+            if self.unit.evolution:
+                # Both the large image AND the thumbnail need attaching.
+                return embed, [self.unit.evolution.image, self.unit.evolution.thumbnail]
+            return embed, []
 
-        elif tab_key == "abilities":
-            if not self.unit.abilities:
-                embed = discord.Embed(
+        if tab_key == "abilities":
+            abilities = self.unit.abilities
+            if not abilities:
+                return discord.Embed(
                     title=f"{self.unit.name} — Abilities",
                     description="This unit has no recorded abilities.",
-                )
-            elif len(self.unit.abilities) == 1:
-                embed = EmbedBuilder.build_ability_embed(self.unit.abilities[0], self.unit.name)
-                image_path = self.unit.abilities[0].thumbnail
-            else:
-                embed = discord.Embed(
-                    title=f"{self.unit.name} — Abilities",
-                    description="Select an ability below to view its details.",
-                )
+                ), []
+            if len(abilities) == 1:
+                return EmbedBuilder.build_ability_embed(abilities[0], self.unit.name), [abilities[0].thumbnail]
+            if index is not None:
+                ability = abilities[index]
+                return EmbedBuilder.build_ability_embed(ability, self.unit.name), [ability.thumbnail]
+            return discord.Embed(
+                title=f"{self.unit.name} — Abilities",
+                description="Select an ability below to view its details.",
+            ), []
 
-        elif tab_key == "passives":
-            if not self.unit.passives:
-                embed = discord.Embed(
+        if tab_key == "passives":
+            passives = self.unit.passives
+            if not passives:
+                return discord.Embed(
                     title=f"{self.unit.name} — Passives",
                     description="This unit has no recorded passives.",
-                )
-            elif len(self.unit.passives) == 1:
-                embed = EmbedBuilder.build_passive_embed(self.unit.passives[0], self.unit.name)
-                # no image_path -- passives have no image field, per schema
-            else:
-                embed = discord.Embed(
-                    title=f"{self.unit.name} — Passives",
-                    description="Select a passive below to view its details.",
-                )
+                ), []
+            if len(passives) == 1:
+                return EmbedBuilder.build_passive_embed(passives[0], self.unit.name), []
+            if index is not None:
+                passive = passives[index]
+                return EmbedBuilder.build_passive_embed(passive, self.unit.name), []
+            return discord.Embed(
+                title=f"{self.unit.name} — Passives",
+                description="Select a passive below to view its details.",
+            ), []
 
-        else:
-            embed = discord.Embed(title="Unknown tab")
+        return discord.Embed(title="Unknown tab"), []
 
-        # Always pass attachments explicitly: [] clears any image left
-        # over from a previous tab, [file] attaches this tab's image.
-        image_file = EmbedBuilder.image_file_for(image_path)
-        attachments = [image_file] if image_file else []
-        await interaction.response.edit_message(embed=embed, view=self, attachments=attachments)
+    async def show_tab(self, interaction: discord.Interaction, tab_key: str, index: int | None = None) -> None:
+        self.active_tab = tab_key
+        self.active_index = index
+        self._rebuild_items()
+
+        embed, image_paths = self._build_display(tab_key, index)
+        files = EmbedBuilder.image_files_for(*image_paths)
+
+        # Always pass attachments explicitly: [] clears any image(s)
+        # left over from a previous tab.
+        await interaction.response.edit_message(embed=embed, view=self, attachments=files)

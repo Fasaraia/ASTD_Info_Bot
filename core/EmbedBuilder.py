@@ -71,9 +71,8 @@ def build_unit_base_embed(unit: Models.Unit) -> discord.Embed:
         title=unit.name,
         color=_color_for(unit.enchant),
     )
-
     if unit.tags:
-        embed.add_field(name="Tags", value=", ".join(unit.tags), inline=True)
+            embed.description = f"`{'`, `'.join(unit.tags)}`"
 
     embed.add_field(name="Enchant", value=unit.enchant.title(), inline=True)
 
@@ -84,9 +83,9 @@ def build_unit_base_embed(unit: Models.Unit) -> discord.Embed:
 
     if unit.basic_attack_tags:
         embed.add_field(
-            name="Basic Attack Effects",
+            name="Status Effect",
             value=", ".join(unit.basic_attack_tags),
-            inline=False,
+            inline=True,
         )
 
     if unit.obtain_method:
@@ -117,14 +116,11 @@ def build_unit_evolution_embed(unit: Models.Unit) -> discord.Embed:
         for material_id, qty in reqs.materials.items():
             material_raw = DataLoader.get_material(material_id)
             display_name = material_raw["name"] if material_raw else material_id
-            lines.append(f"{qty}x {display_name}")
-        embed.add_field(name="Materials", value="\n".join(lines), inline=False)
+            lines.append(f"- {qty}x {display_name}")
+        embed.description = f"## Materials\n{'\n'.join(lines)}"
 
     if reqs.kills is not None:
-        embed.add_field(name="Kill Requirement", value=f"{reqs.kills} kills", inline=False)
-
-    if not reqs.materials and reqs.kills is None:
-        embed.description = "No requirements needed for this evolution."
+        embed.description += f"\n### Kills Requirement\n{reqs.kills}x kills"
 
     _set_image(embed, unit.evolution.image)
     _set_thumbnail(embed, unit.evolution.thumbnail)
@@ -136,14 +132,14 @@ def build_ability_embed(ability: Models.Ability, unit_name: str | None = None) -
     title = ability.name if not unit_name else f"{unit_name} — {ability.name}"
     embed = discord.Embed(title=title, description=ability.description, color=DEFAULT_COLOR)
 
+    if ability.tags:
+            embed.description = f"`{'`, `'.join(ability.tags)}`\n\n{ability.description}"
+
     if ability.cooldown is not None:
         embed.add_field(name="Cooldown", value=f"{ability.cooldown}s", inline=True)
 
     if ability.global_cd is not None:
         embed.add_field(name="Global Cooldown", value=f"{ability.global_cd}s", inline=True)
-
-    if ability.tags:
-        embed.add_field(name="Tags", value=", ".join(ability.tags), inline=False)
 
     _set_thumbnail(embed, ability.thumbnail)
 
@@ -154,14 +150,14 @@ def build_passive_embed(passive: Models.Passive, unit_name: str | None = None) -
     title = passive.name if not unit_name else f"{unit_name} — {passive.name}"
     embed = discord.Embed(title=title, description=passive.description, color=DEFAULT_COLOR)
 
+    if passive.tags:
+        embed.description = f"`{'`, `'.join(passive.tags)}`\n\n{passive.description}"
+    
     if passive.cooldown is not None:
         embed.add_field(name="Cooldown", value=f"{passive.cooldown}s", inline=True)
 
     if passive.global_cd is not None:
         embed.add_field(name="Global Cooldown", value=f"{passive.global_cd}s", inline=True)
-
-    if passive.tags:
-        embed.add_field(name="Tags", value=", ".join(passive.tags), inline=False)
 
     # No image field for passives, per schema.
     return embed

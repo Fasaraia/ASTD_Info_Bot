@@ -9,6 +9,7 @@ core/EmbedBuilder.py, still to come).
 """
 
 import logging
+import os
 
 import discord
 from discord.ext import commands
@@ -48,6 +49,15 @@ class Units(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
+            return
+
+        valid_channels = (int(os.getenv("QUESTIONS_CHANNEL_ID")), int(os.getenv("COMMANDS_CHANNEL_ID")))
+        if message.channel.id not in valid_channels:
+            return
+        
+        valid_roles = (role.id == int(os.getenv("VALID_ROLES")) for role in message.author.roles)
+        
+        if not any(valid_roles) and message.channel.id == int(os.getenv("QUESTIONS_CHANNEL_ID")):
             return
 
         content = message.content.strip()

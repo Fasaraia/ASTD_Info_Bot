@@ -15,6 +15,7 @@ import discord
 from discord.ext import commands
 
 from core import DataLoader, EmbedBuilder
+from utils.StatusEffectView import StatusEffectView
 
 log = logging.getLogger("tdsinfobot.mechanics")
 
@@ -25,10 +26,11 @@ class Mechanics(commands.Cog):
 
     async def handle_status_effect_trigger(self, channel: discord.abc.Messageable, name: str) -> bool:
         """
-        Looks up `name` as a status effect and, if found, sends the
-        results embed. Returns True if it was a match (so the caller's
-        trigger chain can stop), False if `name` isn't a known status
-        effect (so the caller can move on / do nothing).
+        Looks up `name` as a status effect and, if found, sends a
+        paginated results view (25 units per page, with a per-page
+        dropdown to open any listed unit). Returns True if it was a
+        match (so the caller's trigger chain can stop), False if
+        `name` isn't a known status effect.
         """
         effect_id = DataLoader.find_status_effect_id_by_name(name)
         if effect_id is None:
@@ -37,12 +39,11 @@ class Mechanics(commands.Cog):
         effect_data = DataLoader.get_status_effect(effect_id) or {}
         matches = DataLoader.find_units_by_status_effect(effect_id)
 
-        embed = EmbedBuilder.build_status_effect_results_embed(
-            effect_data.get("name", name),
-            effect_data.get("description", ""),
-            matches,
-        )
-        await channel.send(embed=embed)
+        effect_name = effect_data.get("name", name)
+        effect_description = effect_data.get("description", "")
+
+        view = StatusEffectView(effect_name, effect_description, matches)
+        await channel.send(embed=view.current_embed(), view=view)
         return True
 
 

@@ -8,6 +8,7 @@ not here.
 
 import asyncio
 import logging
+import os
 
 import discord
 from discord.ext import commands
@@ -28,6 +29,33 @@ INITIAL_COGS = [
 ]
 
 
+def _channel_role_check(ctx: commands.Context) -> bool:
+    """
+    Global command check applied to every prefix command: only usable
+    in the questions/commands channels, and in the questions channel
+    specifically, only by users with the configured role.
+
+    Commands in cogs/Dev.py are exempt -- they're already gated
+    separately (bot owner / DEV_USER_IDS) and should work from
+    anywhere for whoever's authorized to run them.
+    """
+    if ctx.cog is not None and ctx.cog.qualified_name == "Dev":
+        return True
+
+    questions_channel_id = int(os.getenv("QUESTIONS_CHANNEL_ID"))
+    commands_channel_id = int(os.getenv("COMMANDS_CHANNEL_ID"))
+
+    if ctx.channel.id not in (questions_channel_id, commands_channel_id):
+        return False
+
+    if ctx.channel.id == questions_channel_id:
+        valid_role_id = int(os.getenv("VALID_ROLES"))
+        if not any(role.id == valid_role_id for role in ctx.author.roles):
+            return False
+
+    return True
+
+
 class TDSInfoBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -39,6 +67,7 @@ class TDSInfoBot(commands.Bot):
         intents.members = True          # needed for member join events, member lookups
 
         super().__init__(command_prefix=Config.COMMAND_PREFIX, intents=intents)
+        self.add_check(_channel_role_check)
 
     async def setup_hook(self) -> None:
         for cog in INITIAL_COGS:
@@ -62,6 +91,15 @@ class TDSInfoBot(commands.Bot):
 
     async def on_ready(self):
         log.info("Logged in as %s (ID: %s)", self.user, self.user.id)
+
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+        # A failed global check (wrong channel / missing role) should
+        # fail silently, matching the ";" trigger's behavior elsewhere
+        # -- no error spam in-channel or in the console for something
+        # that's an expected, routine block.
+        if isinstance(error, commands.CheckFailure):
+            return
+        log.exception("Unhandled command error in %s", ctx.command, exc_info=error)
 
 
 async def main():

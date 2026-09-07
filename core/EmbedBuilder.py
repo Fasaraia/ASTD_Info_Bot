@@ -306,3 +306,38 @@ def build_status_effect_results_embed(effect_name: str, effect_description: str,
     # pagination) once the roster grows large enough to exceed it.
     embed.add_field(name="Units", value="\n".join(lines), inline=False)
     return embed
+
+
+STATUS_EFFECT_PAGE_SIZE = 25
+
+
+def build_status_effect_page_embed(
+    effect_name: str, effect_description: str, matches: list[dict], page: int
+) -> discord.Embed:
+    """
+    Same content as build_status_effect_results_embed, but sliced to
+    one page of STATUS_EFFECT_PAGE_SIZE (25) units, matching Discord's
+    25-option select menu cap so every page's dropdown can list every
+    unit on that page. `page` is 0-indexed.
+    """
+    embed = discord.Embed(title=f"Units with {effect_name}", color=DEFAULT_COLOR)
+
+    if effect_description:
+        embed.description = effect_description
+
+    if not matches:
+        embed.add_field(name="Results", value="No units apply this status effect.", inline=False)
+        return embed
+
+    total_pages = max(1, (len(matches) - 1) // STATUS_EFFECT_PAGE_SIZE + 1)
+    start = page * STATUS_EFFECT_PAGE_SIZE
+    page_matches = matches[start:start + STATUS_EFFECT_PAGE_SIZE]
+
+    lines = []
+    for match in page_matches:
+        sources = ", ".join(match["sources"])
+        lines.append(f"**{match['name']}** — {sources}")
+
+    embed.add_field(name="Units", value="\n".join(lines), inline=False)
+    embed.set_footer(text=f"Page {page + 1}/{total_pages} — {len(matches)} unit(s) total")
+    return embed

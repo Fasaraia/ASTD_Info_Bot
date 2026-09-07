@@ -1,1 +1,12 @@
-{}
+{
+  "bleed": {
+    "name": "Bleed",
+    "description": "Deals damage over time, stacks.",
+    "type": "damage_over_time"
+  },
+  "burn": {
+    "name": "Burn",
+    "description": "Deals damage over time based on max HP.",
+    "type": "damage_over_time"
+  }
+}

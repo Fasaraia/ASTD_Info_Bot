@@ -23,7 +23,7 @@ INITIAL_COGS = [
     "cogs.Units",
     "cogs.Dev",
     "cogs.Gamemodes",
-    # "cogs.mechanics",
+    "cogs.Mechanics",
     # "cogs.misc",
 ]
 

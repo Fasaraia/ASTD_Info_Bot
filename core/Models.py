@@ -236,6 +236,28 @@ class StoryDrop:
 
 
 @dataclass
+class TrialStage:
+    stage_number: int
+    name: str
+    enchant: str | None
+    drops: list[StoryDrop]
+    description: str = ""
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "TrialStage":
+        drops = [StoryDrop.from_raw(d) for d in raw.get("drops", [])]
+        return cls(
+            stage_number=raw.get("stage_number", 0),
+            name=raw.get("name", "Unknown Stage"),
+            enchant=raw.get("enchant"),
+            drops=drops,
+            description=raw.get("description", ""),
+            image=raw.get("image"),
+        )
+
+
+@dataclass
 class StoryChapter:
     stage_number: int
     name: str

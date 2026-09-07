@@ -229,6 +229,21 @@ def get_status_effect(effect_id: str) -> dict | None:
     return _status_effects.get(effect_id)
 
 
+def find_status_effect_id_by_name(name: str) -> str | None:
+    """Case-insensitive match against each status effect's display
+    'name' field, returning its internal id (e.g. 'Bleed' -> 'bleed').
+    Status effect ids are expected to be unique (they're dict keys),
+    so at most one match exists."""
+    _ensure_loaded()
+    target = name.lower()
+
+    for effect_id, effect in _status_effects.items():
+        if effect.get("name", "").lower() == target:
+            return effect_id
+
+    return None
+
+
 def get_codes() -> list[dict]:
     _ensure_loaded()
     return _codes
@@ -294,35 +309,39 @@ def find_units_by_status_effect(effect_id: str) -> list[dict]:
     return results
 
 
-def find_ability_owner(ability_name: str) -> tuple[str, int] | None:
+def find_ability_owners(ability_name: str) -> list[tuple[str, int]]:
     """
     Case-insensitive exact match against every unit's ability names.
-    Returns (unit_id, ability_index) for the first match, or None.
-    Ability names are expected to be unique across all units.
+    Returns a list of (unit_id, ability_index) for EVERY match, since
+    multiple units can share the same ability name -- callers decide
+    how to handle 0, 1, or multiple results.
     """
     _ensure_loaded()
     target = ability_name.lower()
+    matches = []
 
     for unit_id, unit in _units.items():
         for i, ability in enumerate(unit.get("abilities", [])):
             if ability.get("name", "").lower() == target:
-                return unit_id, i
+                matches.append((unit_id, i))
 
-    return None
+    return matches
 
 
-def find_passive_owner(passive_name: str) -> tuple[str, int] | None:
+def find_passive_owners(passive_name: str) -> list[tuple[str, int]]:
     """
     Case-insensitive exact match against every unit's passive names.
-    Returns (unit_id, passive_index) for the first match, or None.
-    Passive names are expected to be unique across all units.
+    Returns a list of (unit_id, passive_index) for EVERY match, since
+    multiple units can share the same passive name -- callers decide
+    how to handle 0, 1, or multiple results.
     """
     _ensure_loaded()
     target = passive_name.lower()
+    matches = []
 
     for unit_id, unit in _units.items():
         for i, passive in enumerate(unit.get("passives", [])):
             if passive.get("name", "").lower() == target:
-                return unit_id, i
+                matches.append((unit_id, i))
 
-    return None
+    return matches

@@ -2,15 +2,15 @@
   "chapters": [
     {
       "stage_number": 1,
-      "name": "Starter Plains",
-      "enchant": "fire",
+      "name": "wtf is this stage called",
+      "enchant": "just for w2 but I'm lazy",
       "act_range": [1, 6],
       "drops": [
-        {"name": "Novice Warrior", "range": [1, 3]},
-        {"name": "Flame Sprite", "range": [1, 2]}
+        {"name": "uhhh unit I think", "range": [1, 3]},
+        {"name": "imagine other drop here", "range": [1, 2]}
       ],
       "description": "The very first stage of World 1.",
-      "image": "assets/gamemodes/w1_story_1.png"
+      "image": "assets/placeholder.png"
     }
   ]
 }

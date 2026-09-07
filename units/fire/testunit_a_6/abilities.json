@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Burst",
+    "description": "Deals AoE damage in a radius around the unit",
+    "cooldown": 20,
+    "global_cd": null,
+    "tags": ["nuke", "aoe", "burn"],
+    "thumbnail": "assets/placeholder.png"
+  }
+]

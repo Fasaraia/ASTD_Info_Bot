@@ -1,5 +1,22 @@
 {
   "units": [
-    {"id": "testunit_a_5", "name": "Unit A", "enchant": "fire", "rarity_range": [5, 5]}
+    {
+      "id": "testunit_a_5",
+      "name": "Unit A",
+      "enchant": "fire",
+      "rarity_range": [
+        5,
+        5
+      ]
+    },
+    {
+      "id": "testunit_a_6",
+      "name": "Unit A",
+      "enchant": "fire",
+      "rarity_range": [
+        5,
+        5
+      ]
+    }
   ]
 }

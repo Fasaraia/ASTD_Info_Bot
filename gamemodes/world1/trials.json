@@ -1,0 +1,14 @@
+{
+  "stages": [
+    {
+      "stage_number": 1,
+      "name": "Trial 1",
+      "enchant": "do trials even have these",
+      "drops": [
+        {"name": "Orb or sum", "range": [1, 3]}
+      ],
+      "description": "Balls.",
+      "image": "assets/placeholder.png"
+    }
+  ]
+}

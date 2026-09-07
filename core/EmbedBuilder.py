@@ -237,3 +237,72 @@ def build_story_chapter_embed(world_label: str, chapter: Models.StoryChapter) ->
 
     _set_image(embed, chapter.image)
     return embed
+
+
+def build_trials_overview_embed(world_label: str, stages: list[Models.TrialStage]) -> discord.Embed:
+    """
+    One numbered line per trial stage, same style as the story overview
+    but with no act range, e.g.:
+    1. Ashfall Trial[F] — Trial Guardian 1-3
+    """
+    embed = discord.Embed(title=f"{world_label} Trials", color=DEFAULT_COLOR)
+
+    if not stages:
+        embed.description = "No trial stages on record yet."
+        return embed
+
+    lines = []
+    for stage in stages:
+        letter = ENCHANT_LETTERS.get(stage.enchant.lower()) if stage.enchant else None
+        enchant_part = f"[{letter}]" if letter else ""
+        drop_part = ", ".join(f"{d.name} {d.range[0]}-{d.range[1]}" for d in stage.drops)
+        lines.append(f"{stage.stage_number}. **{stage.name}**{enchant_part} — {drop_part}")
+
+    embed.description = "\n".join(lines)
+    return embed
+
+
+def build_trial_stage_embed(world_label: str, stage: Models.TrialStage) -> discord.Embed:
+    title = f"{world_label} — {stage.name}"
+    embed = discord.Embed(title=title, color=DEFAULT_COLOR)
+
+    if stage.enchant:
+        embed.add_field(name="Enchant", value=stage.enchant.title(), inline=True)
+
+    if stage.drops:
+        drop_lines = "\n".join(f"{d.name} {d.range[0]}-{d.range[1]}" for d in stage.drops)
+        embed.add_field(name="Drops", value=drop_lines, inline=True)
+
+    if stage.description:
+        embed.description = stage.description
+
+    _set_image(embed, stage.image)
+    return embed
+
+
+def build_status_effect_results_embed(effect_name: str, effect_description: str, matches: list[dict]) -> discord.Embed:
+    """
+    matches is the list DataLoader.find_units_by_status_effect() returns:
+    [{"unit_id": ..., "name": ..., "sources": [...]}]. Each unit's
+    sources are shown so it's clear whether the effect comes from a
+    basic attack, a specific ability, or a specific passive.
+    """
+    embed = discord.Embed(title=f"Units with {effect_name}", color=DEFAULT_COLOR)
+
+    if effect_description:
+        embed.description = effect_description
+
+    if not matches:
+        embed.add_field(name="Results", value="No units apply this status effect.", inline=False)
+        return embed
+
+    lines = []
+    for match in matches:
+        sources = ", ".join(match["sources"])
+        lines.append(f"**{match['name']}** — {sources}")
+
+    # Discord field values cap at 1024 chars -- fine for a reasonable
+    # unit count, but will need splitting across multiple fields (or
+    # pagination) once the roster grows large enough to exceed it.
+    embed.add_field(name="Units", value="\n".join(lines), inline=False)
+    return embed

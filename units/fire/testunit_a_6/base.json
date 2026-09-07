@@ -1,0 +1,11 @@
+{
+  "id": "testunit_a_6",
+  "name": "Unit A",
+  "tags": ["ground", "hybrid"],
+  "enchant": "fire",
+  "rarity_range": [5, 5],
+  "evolution_line": ["testunit_a_6", "testunit_a_6_evolved"],
+  "obtain_method": "Summon Banner",
+  "basic_attack_tags": ["bleed"],
+  "thumbnail": "assets/placeholder.png"
+}

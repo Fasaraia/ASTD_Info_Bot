@@ -1,0 +1,9 @@
+[
+  {
+    "name": "Heat",
+    "description": "Nearby units gain +5% attack.",
+    "cooldown": null,
+    "global_cd": null,
+    "tags": ["self-buff"]
+  }
+]

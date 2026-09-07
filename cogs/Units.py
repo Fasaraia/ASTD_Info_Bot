@@ -3,9 +3,10 @@ Unit lookup commands (user-facing, prefix-based) + name-triggered lookup.
 
 Typing ";<name>" triggers a lookup -- the name can be a unit's name
 (opens on the Base tab), an ability's name (opens directly on that
-ability, even if the owning unit has several), or a passive's name
-(same idea). Unit names are checked first, then abilities, then
-passives.
+ability, even if the owning unit has several), a passive's name (same
+idea), or a status effect's name (shows every unit that applies it and
+from where). Unit names are checked first, then abilities, then
+passives, then status effects.
 """
 
 import logging
@@ -16,6 +17,7 @@ from discord.ext import commands
 
 from core import DataLoader, EmbedBuilder, Models
 from utils.UnitView import UnitView
+from utils.DisambiguationView import DisambiguationView, build_disambiguation_embed
 
 log = logging.getLogger("tdsinfobot.units")
 
@@ -89,24 +91,42 @@ class Units(commands.Cog):
             return
 
         # 2. Ability name?
-        ability_match = DataLoader.find_ability_owner(name)
-        if ability_match is not None:
-            owner_unit_id, ability_index = ability_match
+        ability_matches = DataLoader.find_ability_owners(name)
+        if len(ability_matches) == 1:
+            owner_unit_id, ability_index = ability_matches[0]
             await self._send_unit_view(
                 message.channel, owner_unit_id, initial_tab="abilities", initial_index=ability_index
             )
             return
+        elif len(ability_matches) > 1:
+            embed = build_disambiguation_embed(name, len(ability_matches))
+            view = DisambiguationView(ability_matches, tab_key="abilities")
+            await message.channel.send(embed=embed, view=view)
+            return
 
         # 3. Passive name?
-        passive_match = DataLoader.find_passive_owner(name)
-        if passive_match is not None:
-            owner_unit_id, passive_index = passive_match
+        passive_matches = DataLoader.find_passive_owners(name)
+        if len(passive_matches) == 1:
+            owner_unit_id, passive_index = passive_matches[0]
             await self._send_unit_view(
                 message.channel, owner_unit_id, initial_tab="passives", initial_index=passive_index
             )
             return
+        elif len(passive_matches) > 1:
+            embed = build_disambiguation_embed(name, len(passive_matches))
+            view = DisambiguationView(passive_matches, tab_key="passives")
+            await message.channel.send(embed=embed, view=view)
+            return
 
-        # No match on any of the three -- nothing to do.
+        # 4. Status effect name? Delegated to the Mechanics cog, which
+        # owns everything about what a status effect match looks like.
+        mechanics_cog = self.bot.get_cog("Mechanics")
+        if mechanics_cog is not None:
+            handled = await mechanics_cog.handle_status_effect_trigger(message.channel, name)
+            if handled:
+                return
+
+        # No match on any of the four -- nothing to do.
 
 
 async def setup(bot: commands.Bot):

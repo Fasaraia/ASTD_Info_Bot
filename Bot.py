@@ -21,7 +21,7 @@ log = logging.getLogger("tdsinfobot")
 # Prefix-command cogs (units, gamemodes, mechanics, misc) need no syncing
 INITIAL_COGS = [
     "cogs.Units",
-    # "cogs.admin",
+    "cogs.Dev",
     "cogs.Gamemodes",
     # "cogs.mechanics",
     # "cogs.misc",

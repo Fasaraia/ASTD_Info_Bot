@@ -17,7 +17,7 @@ from discord.ext import commands
 
 from core import DataLoader, EmbedBuilder, Models
 from utils.UnitView import UnitView
-from utils.DisambiguationView import DisambiguationView, build_disambiguation_embed
+from utils.DisambiguationView import DisambiguationView
 
 log = logging.getLogger("tdsinfobot.units")
 
@@ -99,9 +99,8 @@ class Units(commands.Cog):
             )
             return
         elif len(ability_matches) > 1:
-            embed = build_disambiguation_embed(name, len(ability_matches))
-            view = DisambiguationView(ability_matches, tab_key="abilities")
-            await message.channel.send(embed=embed, view=view)
+            view = DisambiguationView(name, ability_matches, tab_key="abilities")
+            await message.channel.send(embed=view.embed, view=view)
             return
 
         # 3. Passive name?
@@ -113,9 +112,8 @@ class Units(commands.Cog):
             )
             return
         elif len(passive_matches) > 1:
-            embed = build_disambiguation_embed(name, len(passive_matches))
-            view = DisambiguationView(passive_matches, tab_key="passives")
-            await message.channel.send(embed=embed, view=view)
+            view = DisambiguationView(name, passive_matches, tab_key="passives")
+            await message.channel.send(embed=view.embed, view=view)
             return
 
         # 4. Status effect name? Delegated to the Mechanics cog, which

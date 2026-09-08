@@ -29,7 +29,7 @@ class UnitPickSelect(discord.ui.Select):
             return
 
         unit = Models.Unit.from_raw(raw)
-        view = UnitView(unit)
+        view = UnitView(unit, back_embed=self.parent_view.current_embed(), back_view=self.parent_view)
         embed = view.initial_embed()
         files = EmbedBuilder.image_files_for(*view.initial_image_paths())
         await interaction.response.edit_message(content=None, embed=embed, view=view, attachments=files)

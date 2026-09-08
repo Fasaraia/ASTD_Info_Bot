@@ -56,6 +56,23 @@ class PassiveSelect(discord.ui.Select):
         await self.parent_view.show_tab(interaction, "passives", index=idx)
 
 
+class BackButton(discord.ui.Button):
+    """Returns to whatever embed+view this UnitView was opened from
+    (e.g. an ability/passive disambiguation picker, or a status effect
+    results page). Only added when a UnitView is given a back_target."""
+
+    def __init__(self, back_embed: discord.Embed, back_view: discord.ui.View):
+        super().__init__(label="◀ Back", style=discord.ButtonStyle.secondary)
+        self.back_embed = back_embed
+        self.back_view = back_view
+
+    async def callback(self, interaction: discord.Interaction):
+        # Clear attachments explicitly -- the unit embed we're leaving
+        # may have had an image/thumbnail attached; the page we're
+        # returning to never does.
+        await interaction.response.edit_message(embed=self.back_embed, view=self.back_view, attachments=[])
+
+
 class UnitView(discord.ui.View):
     """
     Attach with:
@@ -74,12 +91,16 @@ class UnitView(discord.ui.View):
         unit: Models.Unit,
         initial_tab: str = "base",
         initial_index: int | None = None,
+        back_embed: discord.Embed | None = None,
+        back_view: discord.ui.View | None = None,
         timeout: float = 180,
     ):
         super().__init__(timeout=timeout)
         self.unit = unit
         self.active_tab = initial_tab
         self.active_index = initial_index
+        self.back_embed = back_embed
+        self.back_view = back_view
         self._rebuild_items()
 
     def initial_embed(self) -> discord.Embed:
@@ -93,9 +114,15 @@ class UnitView(discord.ui.View):
     def _rebuild_items(self) -> None:
         self.clear_items()
 
-        # Row 0: the four tab buttons, always present.
+        # Row 0: the four tab buttons, plus a 5th "Back" button when
+        # this view was opened from a disambiguation picker or a
+        # status effect results page (5 buttons max per row, so this
+        # fits exactly).
         for label, key in self.TABS:
             self.add_item(TabButton(label, key, self, active=(key == self.active_tab)))
+
+        if self.back_embed is not None and self.back_view is not None:
+            self.add_item(BackButton(self.back_embed, self.back_view))
 
         if self.active_tab == "abilities" and len(self.unit.abilities) > 1:
             self.add_item(AbilitySelect(self.unit.abilities, self, self.active_index))

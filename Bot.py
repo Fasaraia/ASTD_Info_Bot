@@ -95,9 +95,9 @@ class TDSInfoBot(commands.Bot):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         # A failed global check (wrong channel / missing role) should
         # fail silently, matching the ";" trigger's behavior elsewhere
-        # -- no error spam in-channel or in the console for something
-        # that's an expected, routine block.
         if isinstance(error, commands.CheckFailure):
+            return
+        if isinstance(error, commands.CommandNotFound):
             return
         log.exception("Unhandled command error in %s", ctx.command, exc_info=error)
 

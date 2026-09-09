@@ -14,9 +14,6 @@ import Config
 from core import DataLoader, Models
 
 # One color per enchant, so embeds are visually distinguishable at a
-# glance. Add new enchants here as they're introduced. Falls back to
-# a neutral color if an enchant isn't listed yet.
-# One color per enchant, so embeds are visually distinguishable at a
 # glance. Falls back to a neutral color if a unit has no enchant or
 # one not listed here.
 ENCHANT_COLORS = {
@@ -96,6 +93,13 @@ def _set_thumbnail(embed: discord.Embed, path: str | None) -> None:
 
 def _color_for(enchant: str) -> discord.Color:
     return ENCHANT_COLORS.get(enchant.lower(), DEFAULT_COLOR)
+
+
+def _format_amount(amount: tuple[int, int]) -> str:
+    """[1, 1] -> 'x1' (exact count), [1, 3] -> 'x1-3' (range). Same
+    field either way -- the display just reflects what's stored."""
+    low, high = amount[0], amount[-1]
+    return f"x{low}" if low == high else f"x{low}-{high}"
 
 
 def build_unit_base_embed(unit: Models.Unit) -> discord.Embed:
@@ -281,12 +285,6 @@ def build_trial_stage_embed(world_label: str, stage: Models.TrialStage) -> disco
 
 
 def build_status_effect_results_embed(effect_name: str, effect_description: str, matches: list[dict]) -> discord.Embed:
-    """
-    matches is the list DataLoader.find_units_by_status_effect() returns:
-    [{"unit_id": ..., "name": ..., "sources": [...]}]. Each unit's
-    sources are shown so it's clear whether the effect comes from a
-    basic attack, a specific ability, or a specific passive.
-    """
     embed = discord.Embed(title=f"Units with {effect_name}", color=DEFAULT_COLOR)
 
     if effect_description:
@@ -301,9 +299,6 @@ def build_status_effect_results_embed(effect_name: str, effect_description: str,
         sources = ", ".join(match["sources"])
         lines.append(f"**{match['name']}** — {sources}")
 
-    # Discord field values cap at 1024 chars -- fine for a reasonable
-    # unit count, but will need splitting across multiple fields (or
-    # pagination) once the roster grows large enough to exceed it.
     embed.add_field(name="Units", value="\n".join(lines), inline=False)
     return embed
 
@@ -314,12 +309,7 @@ STATUS_EFFECT_PAGE_SIZE = 25
 def build_status_effect_page_embed(
     effect_name: str, effect_description: str, matches: list[dict], page: int
 ) -> discord.Embed:
-    """
-    Same content as build_status_effect_results_embed, but sliced to
-    one page of STATUS_EFFECT_PAGE_SIZE (25) units, matching Discord's
-    25-option select menu cap so every page's dropdown can list every
-    unit on that page. `page` is 0-indexed.
-    """
+
     embed = discord.Embed(title=f"Units with {effect_name}", color=DEFAULT_COLOR)
 
     if effect_description:
@@ -340,4 +330,86 @@ def build_status_effect_page_embed(
 
     embed.add_field(name="Units", value="\n".join(lines), inline=False)
     embed.set_footer(text=f"Page {page + 1}/{total_pages} — {len(matches)} unit(s) total")
+    return embed
+
+
+def build_raids_overview_embed(world_label: str, enchant_label: str, raids: list[Models.Raid]) -> discord.Embed:
+    embed = discord.Embed(title=f"{world_label} — {enchant_label} Raids", color=DEFAULT_COLOR)
+
+    if not raids:
+        embed.description = f"No {enchant_label.lower()} raids on record yet."
+        return embed
+
+    lines = []
+    for i, raid in enumerate(raids, start=1):
+        drop_part = ", ".join(f"{d.name} {_format_amount(d.amount)}" for d in raid.drops)
+        lines.append(f"{i}. **{raid.name}** — {drop_part}")
+
+    embed.description = "\n".join(lines)
+    return embed
+
+
+def build_raid_detail_embed(world_label: str, raid: Models.Raid) -> discord.Embed:
+    embed = discord.Embed(title=f"{world_label} — {raid.name}", color=DEFAULT_COLOR)
+
+    if raid.enchant:
+        embed.add_field(name="Enchant", value=raid.enchant.title(), inline=True)
+
+    if raid.drops:
+        drop_lines = "\n".join(f"{d.name} `{_format_amount(d.amount)}`" for d in raid.drops)
+        embed.add_field(name="Drops", value=drop_lines, inline=True)
+
+    _set_image(embed, raid.image)
+    return embed
+
+
+def build_raid_drop_matches_embed(item_name: str, raids: list[Models.Raid]) -> discord.Embed:
+    embed = discord.Embed(title=f"Raids dropping {item_name}", color=DEFAULT_COLOR)
+
+    if not raids:
+        embed.add_field(name="Results", value="No raids drop this item.", inline=False)
+        return embed
+
+    lines = [f"**{r.name}**" for r in raids]
+    embed.add_field(name="Raids", value="\n".join(lines), inline=False)
+    return embed
+
+
+def build_story_drop_matches_embed(item_name: str, chapters: list[Models.StoryChapter]) -> discord.Embed:
+    embed = discord.Embed(title=f"Story stages dropping {item_name}", color=DEFAULT_COLOR)
+    if not chapters:
+        embed.add_field(name="Results", value="No story stages drop this item.", inline=False)
+        return embed
+    lines = [f"**{ch.name}**" for ch in chapters]
+    embed.add_field(name="Stages", value="\n".join(lines), inline=False)
+    return embed
+
+
+def build_trial_drop_matches_embed(item_name: str, stages: list[Models.TrialStage]) -> discord.Embed:
+    embed = discord.Embed(title=f"Trials dropping {item_name}", color=DEFAULT_COLOR)
+    if not stages:
+        embed.add_field(name="Results", value="No trial stages drop this item.", inline=False)
+        return embed
+    lines = [f"**{s.name}**" for s in stages]
+    embed.add_field(name="Stages", value="\n".join(lines), inline=False)
+    return embed
+
+
+def build_unit_material_matches_embed(item_name: str, units: list[dict]) -> discord.Embed:
+    """units: [{"unit_id": ..., "name": ...}]"""
+    embed = discord.Embed(title=f"Units requiring {item_name}", color=DEFAULT_COLOR)
+    if not units:
+        embed.add_field(name="Results", value="No units require this material.", inline=False)
+        return embed
+    lines = [f"**{u['name']}**" for u in units]
+    embed.add_field(name="Units", value="\n".join(lines), inline=False)
+    return embed
+
+
+def build_item_usage_picker_embed(item_name: str, source_counts: dict[str, int]) -> discord.Embed:
+    """source_counts: {"Raids": 2, "Units": 3, ...} -- only sources
+    with at least one match should be included."""
+    embed = discord.Embed(title=f"\"{item_name}\" found in multiple places", color=DEFAULT_COLOR)
+    lines = [f"**{source}** — {count} match(es)" for source, count in source_counts.items()]
+    embed.description = "\n".join(lines) + "\n\nPick a category below:"
     return embed

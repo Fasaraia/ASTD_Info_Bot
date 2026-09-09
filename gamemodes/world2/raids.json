@@ -1,0 +1,24 @@
+{
+  "raids": [
+    {
+      "id": "other_world_raid",
+      "name": "Other World Raid",
+      "enchant": "dark",
+      "drops": [
+        {"name": "Unit A", "amount": [1, 1]},
+        {"name": "Unit B", "amount": [1, 1]},
+        {"name": "Ball", "amount": [1, 1]}
+      ],
+      "image": null
+    },
+    {
+      "id": "raid_lightbringer",
+      "name": "Lightbringer",
+      "enchant": "holy",
+      "drops": [
+        {"name": "Radiant Shard", "amount": [1, 3]}
+      ],
+      "image": null
+    }
+  ]
+}

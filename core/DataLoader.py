@@ -345,3 +345,90 @@ def find_passive_owners(passive_name: str) -> list[tuple[str, int]]:
                 matches.append((unit_id, i))
 
     return matches
+
+
+def get_raids(world: str) -> list[dict]:
+    """Raw raid entries for a world, e.g. get_raids('world2')."""
+    data = get_gamemode_file(world, "raids")
+    return data.get("raids", [])
+
+
+def find_raids_by_enchant(world: str, enchant: str) -> list[dict]:
+    """Case-insensitive match against each raid's enchant field."""
+    target = enchant.lower()
+    return [r for r in get_raids(world) if (r.get("enchant") or "").lower() == target]
+
+
+def find_raids_by_drop(world: str, item_name: str) -> list[dict]:
+    """Every raid in `world` whose drops list contains an item matching
+    item_name (case-insensitive)."""
+    target = item_name.lower()
+    matches = []
+    for raid in get_raids(world):
+        for drop in raid.get("drops", []):
+            if drop.get("name", "").lower() == target:
+                matches.append(raid)
+                break
+    return matches
+
+
+def find_material_id_by_name(name: str) -> str | None:
+    """Case-insensitive match against each material's display 'name'
+    field, returning its internal id."""
+    _ensure_loaded()
+    target = name.lower()
+    for material_id, material in _materials.items():
+        if material.get("name", "").lower() == target:
+            return material_id
+    return None
+
+
+def find_units_needing_material(material_id: str) -> list[dict]:
+    """Every unit whose evolution.requirements.materials references
+    material_id. Returns [{"unit_id": ..., "name": ...}, ...]."""
+    _ensure_loaded()
+    matches = []
+
+    for unit_id, unit in _units.items():
+        evolution = unit.get("evolution") or {}
+        requirements = evolution.get("requirements", {}) or {}
+        materials = requirements.get("materials", {}) or {}
+        if material_id in materials:
+            matches.append({"unit_id": unit_id, "name": unit["base"]["name"]})
+
+    return matches
+
+
+def find_story_stages_by_drop(item_name: str) -> list[dict]:
+    """Every story chapter (across both World 1 and World 2) whose
+    drops include item_name. Each result dict is the raw chapter data
+    with a 'world' and 'world_label' key merged in."""
+    target = item_name.lower()
+    matches = []
+
+    for world, world_label in (("world1", "World 1"), ("world2", "World 2")):
+        data = get_gamemode_file(world, "story")
+        for chapter in data.get("chapters", []):
+            for drop in chapter.get("drops", []):
+                if drop.get("name", "").lower() == target:
+                    matches.append({**chapter, "world": world, "world_label": world_label})
+                    break
+
+    return matches
+
+
+def find_trial_stages_by_drop(item_name: str) -> list[dict]:
+    """Every trial stage (World 1 only -- World 2 has no trials) whose
+    drops include item_name. Each result dict is the raw stage data
+    with a 'world_label' key merged in."""
+    target = item_name.lower()
+    matches = []
+
+    data = get_gamemode_file("world1", "trials")
+    for stage in data.get("stages", []):
+        for drop in stage.get("drops", []):
+            if drop.get("name", "").lower() == target:
+                matches.append({**stage, "world_label": "World 1"})
+                break
+
+    return matches

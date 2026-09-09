@@ -1,18 +1,16 @@
 """
-Unit lookup commands (user-facing, prefix-based) + name-triggered lookup.
+Unit lookup commands and unit-domain trigger handlers.
 
-Typing ";<name>" triggers a lookup -- the name can be a unit's name
-(opens on the Base tab), an ability's name (opens directly on that
-ability, even if the owning unit has several), a passive's name (same
-idea), or a status effect's name (shows every unit that applies it and
-from where). Unit names are checked first, then abilities, then
-passives, then status effects.
+This cog owns everything about what a unit/ability/passive name match
+looks like and displays -- it does NOT listen for messages itself.
+The shared ";<name>" trigger chain lives in cogs/Triggers.py, which
+calls handle_unit_trigger / handle_ability_trigger / handle_passive_trigger
+here, the same way it calls into Mechanics and Gamemodes for their
+domains.
 """
 
 import logging
-import os
 
-import discord
 from discord.ext import commands
 
 from core import DataLoader, EmbedBuilder, Models
@@ -61,70 +59,45 @@ class Units(commands.Cog):
 
         await channel.send(embed=embed, view=view, files=image_files)
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        if message.author.bot:
-            return
-
-        valid_channels = (int(os.getenv("QUESTIONS_CHANNEL_ID")), int(os.getenv("COMMANDS_CHANNEL_ID")))
-        if message.channel.id not in valid_channels:
-            return
-
-        valid_roles = (role.id == int(os.getenv("VALID_ROLES")) for role in message.author.roles)
-
-        if not any(valid_roles) and message.channel.id == int(os.getenv("QUESTIONS_CHANNEL_ID")):
-            return
-
-        content = message.content.strip()
-
-        if not content.startswith(";"):
-            return
-
-        name = content[1:].strip()
-        if not name:
-            return
-
-        # 1. Unit name?
+    async def handle_unit_trigger(self, channel, name: str) -> bool:
         unit_id = self._name_lookup.get(name.lower())
-        if unit_id is not None:
-            await self._send_unit_view(message.channel, unit_id)
-            return
+        if unit_id is None:
+            return False
 
-        # 2. Ability name?
-        ability_matches = DataLoader.find_ability_owners(name)
-        if len(ability_matches) == 1:
-            owner_unit_id, ability_index = ability_matches[0]
-            await self._send_unit_view(
-                message.channel, owner_unit_id, initial_tab="abilities", initial_index=ability_index
-            )
-            return
-        elif len(ability_matches) > 1:
-            view = DisambiguationView(name, ability_matches, tab_key="abilities")
-            await message.channel.send(embed=view.embed, view=view)
-            return
+        await self._send_unit_view(channel, unit_id)
+        return True
 
-        # 3. Passive name?
-        passive_matches = DataLoader.find_passive_owners(name)
-        if len(passive_matches) == 1:
-            owner_unit_id, passive_index = passive_matches[0]
-            await self._send_unit_view(
-                message.channel, owner_unit_id, initial_tab="passives", initial_index=passive_index
-            )
-            return
-        elif len(passive_matches) > 1:
-            view = DisambiguationView(name, passive_matches, tab_key="passives")
-            await message.channel.send(embed=view.embed, view=view)
-            return
+    async def handle_ability_trigger(self, channel, name: str) -> bool:
+        """Ability name match, 0/1/multiple units."""
+        matches = DataLoader.find_ability_owners(name)
 
-        # 4. Status effect name? Delegated to the Mechanics cog, which
-        # owns everything about what a status effect match looks like.
-        mechanics_cog = self.bot.get_cog("Mechanics")
-        if mechanics_cog is not None:
-            handled = await mechanics_cog.handle_status_effect_trigger(message.channel, name)
-            if handled:
-                return
+        if len(matches) == 1:
+            unit_id, index = matches[0]
+            await self._send_unit_view(channel, unit_id, initial_tab="abilities", initial_index=index)
+            return True
 
-        # No match on any of the four -- nothing to do.
+        if len(matches) > 1:
+            view = DisambiguationView(name, matches, tab_key="abilities")
+            await channel.send(embed=view.embed, view=view)
+            return True
+
+        return False
+
+    async def handle_passive_trigger(self, channel, name: str) -> bool:
+        """Same as handle_ability_trigger, for passives."""
+        matches = DataLoader.find_passive_owners(name)
+
+        if len(matches) == 1:
+            unit_id, index = matches[0]
+            await self._send_unit_view(channel, unit_id, initial_tab="passives", initial_index=index)
+            return True
+
+        if len(matches) > 1:
+            view = DisambiguationView(name, matches, tab_key="passives")
+            await channel.send(embed=view.embed, view=view)
+            return True
+
+        return False
 
 
 async def setup(bot: commands.Bot):

@@ -18,13 +18,13 @@ import Config
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("tdsinfobot")
 
-# Cogs to load on startup. Add new cog module names here as they're built.
-# Prefix-command cogs (units, gamemodes, mechanics, misc) need no syncing
 INITIAL_COGS = [
     "cogs.Units",
     "cogs.Dev",
     "cogs.Gamemodes",
     "cogs.Mechanics",
+    "cogs.ItemSearch",
+    "cogs.Triggers",
     # "cogs.misc",
 ]
 
@@ -59,12 +59,8 @@ def _channel_role_check(ctx: commands.Context) -> bool:
 class TDSInfoBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-
-        # Privileged intents — these must ALSO be enabled manually in the
-        # Discord Developer Portal (Bot page > Privileged Gateway Intents)
-        # or the bot will fail to start with PrivilegedIntentsRequired.
-        intents.message_content = True  # needed for prefix commands (!unit, etc.)
-        intents.members = True          # needed for member join events, member lookups
+        intents.message_content = True  
+        intents.members = True     
 
         super().__init__(command_prefix=Config.COMMAND_PREFIX, intents=intents)
         self.add_check(_channel_role_check)
@@ -93,12 +89,13 @@ class TDSInfoBot(commands.Bot):
         log.info("Logged in as %s (ID: %s)", self.user, self.user.id)
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        # A failed global check (wrong channel / missing role) should
-        # fail silently, matching the ";" trigger's behavior elsewhere
+
         if isinstance(error, commands.CheckFailure):
             return
+
         if isinstance(error, commands.CommandNotFound):
             return
+
         log.exception("Unhandled command error in %s", ctx.command, exc_info=error)
 
 

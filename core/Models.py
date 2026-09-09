@@ -280,3 +280,40 @@ class StoryChapter:
             description=raw.get("description", ""),
             image=raw.get("image"),
         )
+
+
+@dataclass
+class RaidDrop:
+    """Separate from StoryDrop since raids use 'amount' (which can mean
+    either an exact count or a range depending on the two values), not
+    'range' like Story/Trials."""
+    name: str
+    amount: tuple[int, int]
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "RaidDrop":
+        amount = raw.get("amount", [0, 0])
+        return cls(
+            name=raw.get("name", ""),
+            amount=(amount[0], amount[-1]),
+        )
+
+
+@dataclass
+class Raid:
+    id: str
+    name: str
+    enchant: str | None
+    drops: list[RaidDrop]
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "Raid":
+        drops = [RaidDrop.from_raw(d) for d in raw.get("drops", [])]
+        return cls(
+            id=raw.get("id", ""),
+            name=raw.get("name", "Unknown Raid"),
+            enchant=raw.get("enchant"),
+            drops=drops,
+            image=raw.get("image"),
+        )

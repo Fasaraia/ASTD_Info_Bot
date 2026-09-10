@@ -199,27 +199,6 @@ class Orb:
         )
 
 
-@dataclass
-class GamemodeStage:
-    id: str
-    name: str
-    description: str
-    reward_currencies: dict[str, int]
-    reward_materials: dict[str, int]
-    image: str | None = None
-
-    @classmethod
-    def from_raw(cls, raw: dict) -> "GamemodeStage":
-        rewards = raw.get("rewards", {}) or {}
-        return cls(
-            id=raw.get("id", ""),
-            name=raw.get("name", "Unknown Stage"),
-            description=raw.get("description", ""),
-            reward_currencies=rewards.get("currencies", {}) or {},
-            reward_materials=rewards.get("materials", {}) or {},
-            image=raw.get("image"),
-        )
-
 
 @dataclass
 class StoryDrop:

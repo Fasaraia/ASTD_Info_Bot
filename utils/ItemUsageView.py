@@ -171,9 +171,20 @@ class ItemUsagePickerView(discord.ui.View):
     {"Raids": [...], "Units": [...]} -- only sources with at least
     one match should be included (callers filter this before
     constructing the view).
+
+    Optionally takes a back_embed/back_view (e.g. the unit "Obtainable
+    From" chooser) if this picker was reached from somewhere other
+    than the top-level ItemSearch trigger.
     """
 
-    def __init__(self, item_name: str, raw_matches: dict[str, list], timeout: float = 180):
+    def __init__(
+        self,
+        item_name: str,
+        raw_matches: dict[str, list],
+        back_embed: discord.Embed | None = None,
+        back_view: discord.ui.View | None = None,
+        timeout: float = 180,
+    ):
         super().__init__(timeout=timeout)
         self.item_name = item_name
         self.raw_matches = raw_matches
@@ -183,3 +194,6 @@ class ItemUsagePickerView(discord.ui.View):
 
         for source in raw_matches:
             self.add_item(SourceButton(source, source, self))
+
+        if back_embed is not None and back_view is not None:
+            self.add_item(BackButton(back_embed, back_view))

@@ -284,25 +284,6 @@ def build_trial_stage_embed(world_label: str, stage: Models.TrialStage) -> disco
     return embed
 
 
-def build_status_effect_results_embed(effect_name: str, effect_description: str, matches: list[dict]) -> discord.Embed:
-    embed = discord.Embed(title=f"Units with {effect_name}", color=DEFAULT_COLOR)
-
-    if effect_description:
-        embed.description = effect_description
-
-    if not matches:
-        embed.add_field(name="Results", value="No units apply this status effect.", inline=False)
-        return embed
-
-    lines = []
-    for match in matches:
-        sources = ", ".join(match["sources"])
-        lines.append(f"**{match['name']}** — {sources}")
-
-    embed.add_field(name="Units", value="\n".join(lines), inline=False)
-    return embed
-
-
 STATUS_EFFECT_PAGE_SIZE = 25
 
 
@@ -412,4 +393,37 @@ def build_item_usage_picker_embed(item_name: str, source_counts: dict[str, int])
     embed = discord.Embed(title=f"\"{item_name}\" found in multiple places", color=DEFAULT_COLOR)
     lines = [f"**{source}** — {count} match(es)" for source, count in source_counts.items()]
     embed.description = "\n".join(lines) + "\n\nPick a category below:"
+    return embed
+
+
+def build_unit_choice_embed(unit_name: str) -> discord.Embed:
+    """The initial chooser shown when a unit is looked up directly by
+    name: pick between viewing the unit itself or where it's
+    obtainable from."""
+    embed = discord.Embed(title=unit_name)
+    embed.description = "What would you like to view?"
+    return embed
+
+
+def build_unit_obtainable_embed(
+    unit_name: str,
+    raids: list[Models.Raid],
+    story_chapters: list[Models.StoryChapter],
+    trial_stages: list[Models.TrialStage],
+) -> discord.Embed:
+    """Reverse lookup: everywhere a drop matching unit_name shows up
+    across Raids, Story, and Trials."""
+    embed = discord.Embed(title=f"{unit_name} — Obtainable From", color=DEFAULT_COLOR)
+
+    if not raids and not story_chapters and not trial_stages:
+        embed.description = "Not currently obtainable from any recorded raid, story stage, or trial."
+        return embed
+
+    if raids:
+        embed.add_field(name="Raids", value="\n".join(f"**{r.name}**" for r in raids), inline=False)
+    if story_chapters:
+        embed.add_field(name="Story", value="\n".join(f"**{c.name}**" for c in story_chapters), inline=False)
+    if trial_stages:
+        embed.add_field(name="Trials", value="\n".join(f"**{s.name}**" for s in trial_stages), inline=False)
+
     return embed

@@ -15,6 +15,7 @@ from discord.ext import commands
 
 from core import DataLoader, EmbedBuilder, Models
 from utils.UnitView import UnitView
+from utils.UnitChoiceView import UnitChoiceView
 from utils.DisambiguationView import DisambiguationView
 
 log = logging.getLogger("tdsinfobot.units")
@@ -60,15 +61,27 @@ class Units(commands.Cog):
         await channel.send(embed=embed, view=view, files=image_files)
 
     async def handle_unit_trigger(self, channel, name: str) -> bool:
+        """Exact (case-insensitive) unit name match. Shows the
+        View Unit / Obtainable From chooser. Returns True if handled,
+        False if `name` isn't a known unit."""
         unit_id = self._name_lookup.get(name.lower())
         if unit_id is None:
             return False
 
-        await self._send_unit_view(channel, unit_id)
+        raw = DataLoader.get_unit(unit_id)
+        if raw is None:
+            log.warning("Unit '%s' is in the name index but has no data.", unit_id)
+            return True
+
+        unit = Models.Unit.from_raw(raw)
+        view = UnitChoiceView(unit)
+        await channel.send(embed=view.embed, view=view)
         return True
 
     async def handle_ability_trigger(self, channel, name: str) -> bool:
-        """Ability name match, 0/1/multiple units."""
+        """Ability name match, 0/1/multiple units. Returns True if
+        handled (a match was found, whether unique or ambiguous),
+        False if `name` isn't a known ability."""
         matches = DataLoader.find_ability_owners(name)
 
         if len(matches) == 1:

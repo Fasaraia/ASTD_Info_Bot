@@ -1,0 +1,9 @@
+{
+  "id": "unit_a_orb",
+  "name": "unit a orb",
+  "description": "Increases initial damage of Unit by +100%.",
+  "obtain_method": "summ sum",
+  "unit_specific": ["test_unit_a"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

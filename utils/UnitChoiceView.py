@@ -30,10 +30,9 @@ class ViewObtainableButton(discord.ui.Button):
         self.parent_view = parent_view
 
     async def callback(self, interaction: discord.Interaction):
-        # Local imports to avoid a circular import at module load time
-        # (RaidsView/ItemUsageView also import from UnitView).
-        from utils.RaidsView import RaidDropMatchView
-        from utils.ItemUsageView import StoryDropMatchView, TrialDropMatchView, ItemUsagePickerView
+        # Local import to avoid a circular import at module load time
+        # (ItemUsageView also imports from UnitView).
+        from utils.ItemUsageView import ItemUsagePickerView, resolve_source_result
 
         unit = self.parent_view.unit
 
@@ -59,17 +58,15 @@ class ViewObtainableButton(discord.ui.Button):
 
         if len(raw_matches) == 1:
             source_key = next(iter(raw_matches))
-            if source_key == "Raids":
-                raids = [Models.Raid.from_raw(r) for r in raw_matches["Raids"]]
-                view = RaidDropMatchView("World 2", unit.name, raids, back_embed=back_embed, back_view=back_view)
-            elif source_key == "Story":
-                view = StoryDropMatchView(unit.name, raw_matches["Story"], back_embed=back_embed, back_view=back_view)
-            else:  # Trials
-                view = TrialDropMatchView(unit.name, raw_matches["Trials"], back_embed=back_embed, back_view=back_view)
+            embed, view, image_paths = resolve_source_result(
+                source_key, unit.name, raw_matches[source_key],
+                back_embed=back_embed, back_view=back_view,
+            )
+            files = EmbedBuilder.image_files_for(*image_paths)
+            await interaction.response.edit_message(embed=embed, view=view, attachments=files)
         else:
             view = ItemUsagePickerView(unit.name, raw_matches, back_embed=back_embed, back_view=back_view)
-
-        await interaction.response.edit_message(embed=view.embed, view=view, attachments=[])
+            await interaction.response.edit_message(embed=view.embed, view=view, attachments=[])
 
 
 class UnitChoiceView(discord.ui.View):

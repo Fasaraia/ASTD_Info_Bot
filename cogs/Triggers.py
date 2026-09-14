@@ -8,9 +8,10 @@ below is a call into another cog's handle_x_trigger(channel, name)
 method, which returns True if it matched (stop the chain) or False
 (try the next one).
 
-Order: unit -> ability -> passive -> status effect -> raid enchant ->
-item usage search (raids/story/trials/unit materials, unified). Add
-new domains by adding one more delegated check here.
+Order: unit -> ability -> passive -> status effect -> orb -> raid
+enchant -> item usage search (raids/story/trials/unit materials,
+now also material info, unified). Add new domains by adding one more
+delegated check here.
 """
 
 import logging
@@ -68,6 +69,8 @@ class Triggers(commands.Cog):
         mechanics_cog = self.bot.get_cog("Mechanics")
         if mechanics_cog is not None:
             if await mechanics_cog.handle_status_effect_trigger(channel, name):
+                return
+            if await mechanics_cog.handle_orb_trigger(channel, name):
                 return
 
         gamemodes_cog = self.bot.get_cog("Gamemodes")

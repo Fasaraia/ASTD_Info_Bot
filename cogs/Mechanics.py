@@ -1,12 +1,12 @@
 """
-Mechanics commands and trigger handlers. The ";<name>" message
-listener itself lives in cogs/Units.py (one shared on_message for the
-whole trigger chain), but the actual status-effect-specific logic
-lives here -- Units.py just calls handle_status_effect_trigger() and
-this cog owns everything about what a status effect match looks like.
+Mechanics commands and trigger handlers. cogs/Triggers.py owns the
+shared ";<name>" message listener; this cog owns everything about
+what a status effect or orb match looks like and displays.
 
-This is also the home for future materials/orbs/currencies/codes
-lookup commands.
+This is also the home for future currencies/codes/cashboost lookup
+commands. Material lookups live in cogs/ItemSearch.py instead, as one
+of the combined item-search sources (since material names can also
+be raid/story/trial drops).
 """
 
 import logging
@@ -14,8 +14,9 @@ import logging
 import discord
 from discord.ext import commands
 
-from core import DataLoader, EmbedBuilder
+from core import DataLoader, EmbedBuilder, Models
 from utils.StatusEffectView import StatusEffectView
+from utils.OrbView import OrbView
 
 log = logging.getLogger("tdsinfobot.mechanics")
 
@@ -44,6 +45,25 @@ class Mechanics(commands.Cog):
 
         view = StatusEffectView(effect_name, effect_description, matches)
         await channel.send(embed=view.current_embed(), view=view)
+        return True
+
+    async def handle_orb_trigger(self, channel: discord.abc.Messageable, name: str) -> bool:
+        """Looks up `name` as an orb and, if found, sends its detail
+        card -- with a dropdown to jump to any unit-specific units, if
+        applicable. Returns True if handled, False otherwise."""
+        orb_id = DataLoader.find_orb_id_by_name(name)
+        if orb_id is None:
+            return False
+
+        raw = DataLoader.get_orb(orb_id)
+        if raw is None:
+            return False
+
+        orb = Models.Orb.from_raw(raw)
+        view = OrbView(orb)
+        image_file = EmbedBuilder.image_file_for(orb.image)
+        files = [image_file] if image_file else []
+        await channel.send(embed=view.embed, view=view, files=files)
         return True
 
 

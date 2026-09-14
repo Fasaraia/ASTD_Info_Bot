@@ -392,7 +392,7 @@ def build_item_usage_picker_embed(item_name: str, source_counts: dict[str, int])
     with at least one match should be included."""
     embed = discord.Embed(title=f"\"{item_name}\" found in multiple places", color=DEFAULT_COLOR)
     lines = [f"**{source}** — {count} match(es)" for source, count in source_counts.items()]
-    embed.description = "\n".join(lines) + "\n\nPick a category below:"
+    embed.description = "\n".join(lines) + "\n\nSelect an entry below:"
     return embed
 
 
@@ -426,4 +426,34 @@ def build_unit_obtainable_embed(
     if trial_stages:
         embed.add_field(name="Trials", value="\n".join(f"**{s.name}**" for s in trial_stages), inline=False)
 
+    return embed
+
+
+def build_orb_detail_embed(orb: Models.Orb) -> discord.Embed:
+    embed = discord.Embed(title=orb.name, description=orb.description, color=DEFAULT_COLOR)
+
+    if orb.obtain_method:
+        embed.add_field(name="Obtain Method", value=orb.obtain_method, inline=False)
+
+    if orb.unit_specific:
+        embed.add_field(name="Unit-Specific", value=", ".join(orb.unit_specific), inline=False)
+
+    if orb.granted_ability:
+        ga = orb.granted_ability
+        ability_text = ga.description
+        if ga.cooldown is not None:
+            ability_text += f"\nCooldown: {ga.cooldown}s"
+        embed.add_field(name=f"Grants: {ga.name}", value=ability_text, inline=False)
+
+    _set_thumbnail(embed, orb.image)
+    return embed
+
+
+def build_material_detail_embed(material: Models.Material) -> discord.Embed:
+    embed = discord.Embed(title=material.name, color=DEFAULT_COLOR)
+
+    if material.obtain_method:
+        embed.add_field(name="Obtain Method", value=material.obtain_method, inline=False)
+
+    _set_thumbnail(embed, material.image)
     return embed

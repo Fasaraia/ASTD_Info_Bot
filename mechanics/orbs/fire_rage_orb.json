@@ -1,0 +1,9 @@
+{
+  "id": "fire_rage_orb",
+  "name": "Fire Rage Orb",
+  "description": "Increases initial damage of Unit by +100%.",
+  "obtain_method": "Trial 70",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

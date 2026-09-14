@@ -42,15 +42,21 @@ class Dev(commands.Cog):
 
         unit_count = BuildIndex.build_index()
         DataLoader.reload()
+        counts = DataLoader.load_all()
 
-        # The Units cog caches a name -> id lookup built from
-        # units_index.json at startup -- refresh it so newly indexed
-        # units are actually findable via ";<name>" right away.
         units_cog = self.bot.get_cog("Units")
         if units_cog is not None:
             units_cog.refresh_name_lookup()
 
-        await ctx.send(f"Reloaded. {unit_count} unit(s) indexed.")
+        await ctx.send(f"Reloaded. "
+                    f"{counts['units']} units, "
+                    f"{counts['materials']} materials, "
+                    f"{counts['currencies']} currencies, "
+                    f"{counts['status_effects']} status effects, "
+                    f"{counts['codes']} codes, "
+                    f"{counts['orbs']} orbs, "
+                    f"{counts['gamemodes']} gamemodes, "
+                    f"{counts['misc']} misc files.")
 
 
 async def setup(bot: commands.Bot):

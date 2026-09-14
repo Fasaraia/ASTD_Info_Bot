@@ -191,6 +191,19 @@ def load_all() -> None:
     _loaded = True
     log.info("Data load complete.")
 
+    return {
+        "units": len(_units),
+        "units_index": len(_units_index),
+        "materials": len(_materials),
+        "currencies": len(_currencies),
+        "status_effects": len(_status_effects),
+        "codes": len(_codes),
+        "orbs": len(_orbs),
+        "orbs_index": len(_orbs_index),
+        "gamemodes": len(_gamemodes),
+        "misc": len(_misc),
+    }
+
 
 def reload() -> None:
     """Alias for load_all() — call this from a dev command after editing JSON."""
@@ -432,3 +445,14 @@ def find_trial_stages_by_drop(item_name: str) -> list[dict]:
                 break
 
     return matches
+
+
+def find_orb_id_by_name(name: str) -> str | None:
+    """Case-insensitive match against each orb's display 'name' field,
+    returning its internal id."""
+    _ensure_loaded()
+    target = name.lower()
+    for orb_id, orb in _orbs.items():
+        if orb.get("name", "").lower() == target:
+            return orb_id
+    return None

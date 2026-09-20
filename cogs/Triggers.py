@@ -77,6 +77,8 @@ class Triggers(commands.Cog):
         if gamemodes_cog is not None:
             if await gamemodes_cog.handle_raid_enchant_trigger(channel, name):
                 return
+            if await gamemodes_cog.handle_zone_trigger(channel, name):
+                return
 
         itemsearch_cog = self.bot.get_cog("ItemSearch")
         if itemsearch_cog is not None:

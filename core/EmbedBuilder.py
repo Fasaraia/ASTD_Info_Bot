@@ -466,6 +466,12 @@ def build_static_gamemode_embed(info: Models.StaticGamemodeInfo) -> discord.Embe
     _set_image(embed, info.image)
     return embed
 
+def build_zone_embed(zone: Models.ZoneInfo) -> discord.Embed:
+    embed = discord.Embed(title=zone.title, description=zone.description, color=DEFAULT_COLOR)
+    embed.add_field(name="Category Allowed", value=zone.category_allowed or "Not specified", inline=False)
+    _set_image(embed, zone.image)
+    return embed
+
 
 def build_currency_detail_embed(currency: Models.Currency) -> discord.Embed:
     embed = discord.Embed(title=currency.name, color=DEFAULT_COLOR)

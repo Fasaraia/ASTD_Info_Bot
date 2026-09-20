@@ -17,6 +17,8 @@ Ticket Mode: !ticketmode, single static embed.
 Infinite Mode: !infinite, same content in both worlds so it's stored
 as one shared file -- 2 tabs (Main/Rewards) via InfiniteView.
 Portal: !w1portal, same 2-tab (Main/Rewards) pattern via InfiniteView.
+Zones: !zones, data-driven zone tabs via ZonesView; individual zones can
+also be opened through the ";" trigger.
 Tournament: !tournament, 4-tab view (Main/Local/Global/Previous
 Rewards), each rewards tab searchable via a dropdown into the actual
 unit/material/currency/orb page.
@@ -33,6 +35,7 @@ from utils.TrialsView import TrialsView
 from utils.RaidsView import RaidsView
 from utils.TournamentView import TournamentView
 from utils.InfiniteView import InfiniteView
+from utils.ZonesView import ZonesView
 
 log = logging.getLogger("tdsinfobot.gamemodes")
 
@@ -45,6 +48,22 @@ RAID_ENCHANT_TRIGGERS = {f"{enchant}raids": enchant for enchant in EmbedBuilder.
 class Gamemodes(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self._zone_lookup: dict[str, str] = {}
+        self.refresh_zone_lookup()
+
+    def _get_zones(self) -> dict[str, Models.ZoneInfo]:
+        data = DataLoader.get_shared_gamemode_file("zones")
+        return {
+            key: Models.ZoneInfo.from_raw(raw)
+            for key, raw in data.items()
+            if isinstance(raw, dict)
+        }
+
+    def refresh_zone_lookup(self) -> None:
+        self._zone_lookup = {}
+        for key, zone in self._get_zones().items():
+            self._zone_lookup[key.lower()] = key
+            self._zone_lookup[zone.title.lower()] = key
 
     def _get_story_chapters(self, world: str) -> list[Models.StoryChapter]:
         data = DataLoader.get_gamemode_file(world, "story")
@@ -95,6 +114,22 @@ class Gamemodes(commands.Cog):
         await channel.send(embed=view.embed, view=view)
         return True
 
+    async def handle_zone_trigger(self, channel: discord.abc.Messageable, name: str) -> bool:
+        zone_key = self._zone_lookup.get(name.lower())
+        if zone_key is None:
+            return False
+
+        zones = self._get_zones()
+        if zone_key not in zones:
+            log.warning("Zone '%s' is in the lookup but has no data.", zone_key)
+            return True
+
+        view = ZonesView(zones, initial_tab=zone_key)
+        image_file = EmbedBuilder.image_file_for(view.initial_image_path())
+        files = [image_file] if image_file else []
+        await channel.send(embed=view.initial_embed(), view=view, files=files)
+        return True
+
     async def _send_static_gamemode(self, ctx: commands.Context, world: str, category: str):
         data = DataLoader.get_gamemode_file(world, category)
         info = Models.StaticGamemodeInfo.from_raw(data)
@@ -128,6 +163,18 @@ class Gamemodes(commands.Cog):
     async def portal(self, ctx: commands.Context):
         data = DataLoader.get_gamemode_file("world1", "portal")
         await self._send_infinite_view(ctx, data)
+
+    @commands.command(name="zones", help="Show all zones and their allowed categories.")
+    async def zones(self, ctx: commands.Context):
+        zones = self._get_zones()
+        if not zones:
+            await ctx.send("No zone data is configured.")
+            return
+
+        view = ZonesView(zones)
+        image_file = EmbedBuilder.image_file_for(view.initial_image_path())
+        files = [image_file] if image_file else []
+        await ctx.send(embed=view.initial_embed(), view=view, files=files)
 
     @commands.command(name="tournament", help="Show World 1 Tournament Mode info.")
     async def w1tournament(self, ctx: commands.Context):

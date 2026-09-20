@@ -316,6 +316,30 @@ class StaticGamemodeInfo:
 
 
 @dataclass
+class ZoneInfo:
+    """One zone entry shown by ZonesView."""
+    title: str
+    category_allowed: str
+    description: str
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "ZoneInfo":
+        category_allowed = raw.get("category_allowed", "")
+        if isinstance(category_allowed, list):
+            category_allowed = ", ".join(str(value) for value in category_allowed)
+        else:
+            category_allowed = str(category_allowed)
+
+        return cls(
+            title=raw.get("title", "Zone"),
+            category_allowed=category_allowed,
+            description=raw.get("description", ""),
+            image=raw.get("image"),
+        )
+
+
+@dataclass
 class TournamentRewards:
     """One reward tier (local/global/previous) -- each list holds ids
     referencing existing data (units/materials/currencies/orbs), not

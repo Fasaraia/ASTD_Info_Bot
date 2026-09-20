@@ -1,0 +1,8 @@
+{
+  "example": {
+    "title": "Example Zone",
+    "category_allowed": "Replace with the categories allowed in this zone.",
+    "description": "Replace this entry with the zone description.",
+    "image": null
+  }
+}

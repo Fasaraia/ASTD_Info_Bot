@@ -40,7 +40,7 @@ class Dev(commands.Cog):
             await ctx.send("This command is dev-only.")
             return
 
-        unit_count = BuildIndex.build_index()
+        BuildIndex.build_index()
         DataLoader.reload()
         counts = DataLoader.load_all()
 
@@ -48,15 +48,7 @@ class Dev(commands.Cog):
         if units_cog is not None:
             units_cog.refresh_name_lookup()
 
-        await ctx.send(f"Reloaded. "
-                    f"{counts['units']} units, "
-                    f"{counts['materials']} materials, "
-                    f"{counts['currencies']} currencies, "
-                    f"{counts['status_effects']} status effects, "
-                    f"{counts['codes']} codes, "
-                    f"{counts['orbs']} orbs, "
-                    f"{counts['gamemodes']} gamemodes, "
-                    f"{counts['misc']} misc files.")
+        await ctx.send(f"Reloaded. ")
 
 
 async def setup(bot: commands.Bot):

@@ -3,7 +3,7 @@
   "name": "unit a orb",
   "description": "Increases initial damage of Unit by +100%.",
   "obtain_method": "summ sum",
-  "unit_specific": ["test_unit_a"],
+  "unit_specific": ["testunit_a_5"],
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

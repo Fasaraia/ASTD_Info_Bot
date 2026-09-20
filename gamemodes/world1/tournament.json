@@ -1,0 +1,43 @@
+{
+  "name": "Tournament Mode",
+  "description": "A competitive mode where players face off in scored matches.",
+  "format": "Weekly rotating bracket, top players earn exclusive rewards.",
+  "rules": "Each match uses a fixed unit pool; no evolutions above 6\u2605 allowed.",
+  "image": null,
+  "local_rewards": {
+    "units": [
+      "unit_a"
+    ],
+    "materials": [
+      "fire_shard"
+    ],
+    "currencies": [
+      "gold"
+    ],
+    "orbs": [
+      "orb_a"
+    ]
+  },
+  "global_rewards": {
+    "units": [],
+    "materials": [
+      "fire_shard"
+    ],
+    "currencies": [],
+    "orbs": []
+  },
+  "previous_rewards": {
+    "units": [
+      "unit_a"
+    ],
+    "materials": [
+      "fire_shard"
+    ],
+    "currencies": [
+      "gold"
+    ],
+    "orbs": [
+      "orb_a"
+    ]
+  }
+}

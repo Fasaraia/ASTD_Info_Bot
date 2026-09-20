@@ -296,3 +296,65 @@ class Raid:
             drops=drops,
             image=raw.get("image"),
         )
+
+
+@dataclass
+class StaticGamemodeInfo:
+    """Reused for any gamemode category that's just one static
+    embed -- Ticket Mode, Infinite Modes."""
+    title: str
+    description: str
+    image: str | None = None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "StaticGamemodeInfo":
+        return cls(
+            title=raw.get("title", "Info"),
+            description=raw.get("description", ""),
+            image=raw.get("image"),
+        )
+
+
+@dataclass
+class TournamentRewards:
+    """One reward tier (local/global/previous) -- each list holds ids
+    referencing existing data (units/materials/currencies/orbs), not
+    plain text, so every reward is independently searchable/linkable."""
+    units: list[str]
+    materials: list[str]
+    currencies: list[str]
+    orbs: list[str]
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "TournamentRewards":
+        return cls(
+            units=raw.get("units", []),
+            materials=raw.get("materials", []),
+            currencies=raw.get("currencies", []),
+            orbs=raw.get("orbs", []),
+        )
+
+
+@dataclass
+class Tournament:
+    name: str
+    description: str
+    format: str
+    rules: str
+    image: str | None
+    local_rewards: TournamentRewards
+    global_rewards: TournamentRewards
+    previous_rewards: TournamentRewards
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> "Tournament":
+        return cls(
+            name=raw.get("name", "Tournament Mode"),
+            description=raw.get("description", ""),
+            format=raw.get("format", ""),
+            rules=raw.get("rules", ""),
+            image=raw.get("image"),
+            local_rewards=TournamentRewards.from_raw(raw.get("local_rewards", {})),
+            global_rewards=TournamentRewards.from_raw(raw.get("global_rewards", {})),
+            previous_rewards=TournamentRewards.from_raw(raw.get("previous_rewards", {})),
+        )

@@ -19,8 +19,8 @@ from core import DataLoader, Models
 ENCHANT_COLORS = {
     "fire": discord.Color.orange(),
     "nature": discord.Color.green(),
-    "earth": discord.Color.dark_gold(),
-    "wind": discord.Color.teal(),
+    "electric": discord.Color.dark_gold(),
+    "water": discord.Color.teal(),
     "dark": discord.Color.dark_purple(),
     "holy": discord.Color.gold(),
 }
@@ -30,8 +30,8 @@ ENCHANT_COLORS = {
 ENCHANT_LETTERS = {
     "fire": "F",
     "nature": "N",
-    "earth": "E",
-    "wind": "W",
+    "electric": "E",
+    "water": "W",
     "dark": "D",
     "holy": "H",
 }
@@ -456,4 +456,63 @@ def build_material_detail_embed(material: Models.Material) -> discord.Embed:
         embed.add_field(name="Obtain Method", value=material.obtain_method, inline=False)
 
     _set_thumbnail(embed, material.image)
+    return embed
+
+
+def build_static_gamemode_embed(info: Models.StaticGamemodeInfo) -> discord.Embed:
+    """Ticket Mode, Infinite Modes -- any category that's just one
+    static embed, no stages/list."""
+    embed = discord.Embed(title=info.title, description=info.description, color=DEFAULT_COLOR)
+    _set_image(embed, info.image)
+    return embed
+
+
+def build_currency_detail_embed(currency: Models.Currency) -> discord.Embed:
+    embed = discord.Embed(title=currency.name, color=DEFAULT_COLOR)
+
+    if currency.obtain_methods:
+        embed.add_field(name="Obtain Methods", value=", ".join(currency.obtain_methods), inline=False)
+    if currency.used_for:
+        embed.add_field(name="Used For", value=", ".join(currency.used_for), inline=False)
+
+    _set_thumbnail(embed, currency.image)
+    return embed
+
+
+def build_tournament_main_embed(tournament: Models.Tournament) -> discord.Embed:
+    embed = discord.Embed(title=tournament.name, description=tournament.description, color=DEFAULT_COLOR)
+
+    if tournament.format:
+        embed.add_field(name="Format", value=tournament.format, inline=False)
+    if tournament.rules:
+        embed.add_field(name="Rules", value=tournament.rules, inline=False)
+
+    _set_image(embed, tournament.image)
+    return embed
+
+
+def build_tournament_rewards_embed(tab_label: str, rewards: Models.TournamentRewards) -> discord.Embed:
+    """Lists every reward in this tier by resolved display name --
+    units/materials/currencies/orbs all shown together, one line each."""
+    embed = discord.Embed(title=f"Tournament — {tab_label}", color=DEFAULT_COLOR)
+
+    lines = []
+    for unit_id in rewards.units:
+        raw = DataLoader.get_unit(unit_id)
+        name = raw["base"]["name"] if raw else unit_id
+        lines.append(f"**{name}** (Unit)")
+    for material_id in rewards.materials:
+        raw = DataLoader.get_material(material_id)
+        name = raw["name"] if raw else material_id
+        lines.append(f"**{name}** (Material)")
+    for currency_id in rewards.currencies:
+        raw = DataLoader.get_currency(currency_id)
+        name = raw["name"] if raw else currency_id
+        lines.append(f"**{name}** (Currency)")
+    for orb_id in rewards.orbs:
+        raw = DataLoader.get_orb(orb_id)
+        name = raw["name"] if raw else orb_id
+        lines.append(f"**{name}** (Orb)")
+
+    embed.description = "\n".join(lines) if lines else "No rewards on record for this tier yet."
     return embed

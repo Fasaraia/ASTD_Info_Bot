@@ -39,9 +39,18 @@ class OrbUnitSelect(discord.ui.Select):
 
 
 class OrbView(discord.ui.View):
-    def __init__(self, orb: Models.Orb, timeout: float = 180):
+    def __init__(
+        self,
+        orb: Models.Orb,
+        back_embed: discord.Embed | None = None,
+        back_view: discord.ui.View | None = None,
+        timeout: float = 180,
+    ):
         super().__init__(timeout=timeout)
         self.orb = orb
         self.embed = EmbedBuilder.build_orb_detail_embed(orb)
         if orb.unit_specific:
             self.add_item(OrbUnitSelect(orb.unit_specific, self))
+        if back_embed is not None and back_view is not None:
+            from utils.UnitView import BackButton
+            self.add_item(BackButton(back_embed, back_view))

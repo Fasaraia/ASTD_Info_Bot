@@ -12,6 +12,14 @@ handle_raid_enchant_trigger, which Triggers.py calls into. Raid DROP
 search (";<item name>") is now owned by cogs/ItemSearch.py instead,
 since an item can come from Raids, Story, Trials, or Unit evolution
 materials all at once.
+
+Ticket Mode: !ticketmode, single static embed.
+Infinite Mode: !infinite, same content in both worlds so it's stored
+as one shared file -- 2 tabs (Main/Rewards) via InfiniteView.
+Portal: !w1portal, same 2-tab (Main/Rewards) pattern via InfiniteView.
+Tournament: !tournament, 4-tab view (Main/Local/Global/Previous
+Rewards), each rewards tab searchable via a dropdown into the actual
+unit/material/currency/orb page.
 """
 
 import logging
@@ -23,6 +31,8 @@ from core import DataLoader, EmbedBuilder, Models
 from utils.StoryView import StoryView
 from utils.TrialsView import TrialsView
 from utils.RaidsView import RaidsView
+from utils.TournamentView import TournamentView
+from utils.InfiniteView import InfiniteView
 
 log = logging.getLogger("tdsinfobot.gamemodes")
 
@@ -84,6 +94,50 @@ class Gamemodes(commands.Cog):
         view = RaidsView("World 2", enchant.title(), raids)
         await channel.send(embed=view.embed, view=view)
         return True
+
+    async def _send_static_gamemode(self, ctx: commands.Context, world: str, category: str):
+        data = DataLoader.get_gamemode_file(world, category)
+        info = Models.StaticGamemodeInfo.from_raw(data)
+        embed = EmbedBuilder.build_static_gamemode_embed(info)
+        image_file = EmbedBuilder.image_file_for(info.image)
+        files = [image_file] if image_file else []
+        await ctx.send(embed=embed, files=files)
+
+    async def _send_infinite_view(self, ctx: commands.Context, data: dict):
+        """data has 'main' and 'rewards' keys, each a StaticGamemodeInfo shape."""
+        pages = {
+            "Main": Models.StaticGamemodeInfo.from_raw(data.get("main", {})),
+            "Rewards": Models.StaticGamemodeInfo.from_raw(data.get("rewards", {})),
+        }
+        view = InfiniteView(pages)
+        embed = view.initial_embed()
+        image_file = EmbedBuilder.image_file_for(view.initial_image_path())
+        files = [image_file] if image_file else []
+        await ctx.send(embed=embed, view=view, files=files)
+
+    @commands.command(name="ticketmode", help="Show World 1 Ticket Mode info.")
+    async def w1ticketmode(self, ctx: commands.Context):
+        await self._send_static_gamemode(ctx, "world1", "ticket_modes")
+
+    @commands.command(name="infinite", help="Show Infinite Mode info, with a Rewards page.")
+    async def infinite(self, ctx: commands.Context):
+        data = DataLoader.get_shared_gamemode_file("infinite")
+        await self._send_infinite_view(ctx, data)
+
+    @commands.command(name="portal", help="Show World 1 Portal info, with a Rewards page.")
+    async def portal(self, ctx: commands.Context):
+        data = DataLoader.get_gamemode_file("world1", "portal")
+        await self._send_infinite_view(ctx, data)
+
+    @commands.command(name="tournament", help="Show World 1 Tournament Mode info.")
+    async def w1tournament(self, ctx: commands.Context):
+        data = DataLoader.get_gamemode_file("world1", "tournament")
+        tournament = Models.Tournament.from_raw(data)
+        view = TournamentView(tournament)
+        embed = view.initial_embed()
+        image_file = EmbedBuilder.image_file_for(tournament.image)
+        files = [image_file] if image_file else []
+        await ctx.send(embed=embed, view=view, files=files)
 
 
 async def setup(bot: commands.Bot):

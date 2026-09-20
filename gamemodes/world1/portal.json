@@ -1,0 +1,12 @@
+{
+  "main": {
+    "title": "Portal",
+    "description": "Enter the Portal to face unique cross-world challenges.",
+    "image": null
+  },
+  "rewards": {
+    "title": "Portal Rewards",
+    "description": "Portal-exclusive rewards not found elsewhere.",
+    "image": null
+  }
+}

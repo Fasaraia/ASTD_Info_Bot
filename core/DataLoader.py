@@ -34,6 +34,7 @@ _cashboost: dict = {}
 _orbs: dict[str, dict] = {}
 _orbs_index: list[dict] = []
 _gamemodes: dict[str, dict] = {}       # "world1/story" -> file contents
+_shared_gamemodes: dict[str, dict] = {}  # "infinite_modes" -> file contents (not per-world)
 _misc: dict[str, dict] = {}            # "highest_dps" -> file contents
 
 _loaded = False
@@ -151,19 +152,24 @@ def _load_orbs() -> None:
 
 def _load_gamemodes() -> None:
     _gamemodes.clear()
+    _shared_gamemodes.clear()
 
     if not Config.GAMEMODES_DIR.exists():
         log.warning("Gamemodes directory not found: %s", Config.GAMEMODES_DIR)
         return
 
-    for world_dir in Config.GAMEMODES_DIR.iterdir():
-        if not world_dir.is_dir():
-            continue
-        for file in world_dir.glob("*.json"):
-            key = f"{world_dir.name}/{file.stem}"  # e.g. "world1/story"
-            _gamemodes[key] = _read_json(file) or {}
+    for entry in Config.GAMEMODES_DIR.iterdir():
+        if entry.is_dir():
+            for file in entry.glob("*.json"):
+                key = f"{entry.name}/{file.stem}"  # e.g. "world1/story"
+                _gamemodes[key] = _read_json(file) or {}
+        elif entry.suffix == ".json":
+            _shared_gamemodes[entry.stem] = _read_json(entry) or {}
 
-    log.info("Loaded %d gamemode file(s)", len(_gamemodes))
+    log.info(
+        "Loaded %d gamemode file(s), %d shared",
+        len(_gamemodes), len(_shared_gamemodes),
+    )
 
 
 def _load_misc() -> None:
@@ -190,19 +196,6 @@ def load_all() -> None:
     _load_misc()
     _loaded = True
     log.info("Data load complete.")
-
-    return {
-        "units": len(_units),
-        "units_index": len(_units_index),
-        "materials": len(_materials),
-        "currencies": len(_currencies),
-        "status_effects": len(_status_effects),
-        "codes": len(_codes),
-        "orbs": len(_orbs),
-        "orbs_index": len(_orbs_index),
-        "gamemodes": len(_gamemodes),
-        "misc": len(_misc),
-    }
 
 
 def reload() -> None:
@@ -281,6 +274,14 @@ def get_gamemode_file(world: str, name: str) -> dict:
     """e.g. get_gamemode_file("world1", "story")"""
     _ensure_loaded()
     return _gamemodes.get(f"{world}/{name}", {})
+
+
+def get_shared_gamemode_file(name: str) -> dict:
+    """For gamemode content that's identical across worlds, stored as
+    a top-level file directly under gamemodes/ rather than nested in
+    a world folder. e.g. get_shared_gamemode_file("infinite_modes")"""
+    _ensure_loaded()
+    return _shared_gamemodes.get(name, {})
 
 
 def get_misc(name: str) -> dict:

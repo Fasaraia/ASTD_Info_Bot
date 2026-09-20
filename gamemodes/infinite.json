@@ -1,0 +1,12 @@
+{
+  "main": {
+    "title": "Infinite Mode",
+    "description": "Survive endless waves of enemies for escalating rewards. Identical in both World 1 and World 2.",
+    "image": null
+  },
+  "rewards": {
+    "title": "Infinite Mode Rewards",
+    "description": "Rewards scale with how many waves you survive.",
+    "image": null
+  }
+}

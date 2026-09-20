@@ -3,7 +3,7 @@
     {
       "id": "other_world_raid",
       "name": "Other World Raid",
-      "enchant": "dark",
+      "enchant": "water",
       "drops": [
         {"name": "Unit A", "amount": [1, 1]},
         {"name": "Unit B", "amount": [1, 1]},

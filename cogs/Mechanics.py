@@ -65,6 +65,18 @@ class Mechanics(commands.Cog):
         files = [image_file] if image_file else []
         await channel.send(embed=view.embed, view=view, files=files)
         return True
+    
+    @commands.command(name="codes", help="Show all currently active codes.")
+    async def codes(self, ctx: commands.Context):
+        codes = DataLoader.get_codes()
+        embed = EmbedBuilder.build_codes_embed(codes)
+        await ctx.send(embed=embed)
+
+    @commands.command(name="cashboost", help="Show Cash Boost info.")
+    async def cashboost(self, ctx: commands.Context):
+        cashboost = DataLoader.get_cashboost()
+        embed = EmbedBuilder.build_cashboost_embed(cashboost)
+        await ctx.send(embed=embed)
 
 
 async def setup(bot: commands.Bot):

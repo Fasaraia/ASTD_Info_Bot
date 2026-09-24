@@ -522,3 +522,43 @@ def build_tournament_rewards_embed(tab_label: str, rewards: Models.TournamentRew
 
     embed.description = "\n".join(lines) if lines else "No rewards on record for this tier yet."
     return embed
+
+def build_codes_embed(codes: list[dict]) -> discord.Embed:
+    embed = discord.Embed(title="Active Codes", color=DEFAULT_COLOR)
+    if not codes:
+        embed.description = "No active codes on record."
+        return embed
+    lines = [f"**{c['code']}** — {c['reward']}" for c in codes]
+    embed.description = "\n".join(lines)
+    return embed
+
+
+def build_cashboost_embed(cashboost: dict) -> discord.Embed:
+    name = cashboost.get("name", "Cash Boost")
+    description = cashboost.get("description", "")
+    embed = discord.Embed(title=name, description=description, color=DEFAULT_COLOR)
+    return embed
+
+
+def build_highest_dps_embed(data: dict) -> discord.Embed:
+    embed = discord.Embed(title="Highest DPS", color=DEFAULT_COLOR)
+    if data.get("raid_dps"):
+        embed.add_field(name="Raid DPS", value=data["raid_dps"], inline=False)
+    if data.get("max_dps"):
+        embed.add_field(name="Max DPS", value=data["max_dps"], inline=False)
+    if data.get("dot_dps"):
+        embed.add_field(name="DoT DPS", value=data["dot_dps"], inline=False)
+    if not embed.fields:
+        embed.description = "No highest-DPS rankings on record yet."
+    return embed
+
+
+def build_highest_nukes_embed(data: dict) -> discord.Embed:
+    embed = discord.Embed(title="Highest Nukes", color=DEFAULT_COLOR)
+    if data.get("raid"):
+        embed.add_field(name="Raid", value=data["raid"], inline=False)
+    if data.get("max"):
+        embed.add_field(name="Max", value=data["max"], inline=False)
+    if not embed.fields:
+        embed.description = "No highest-nuke rankings on record yet."
+    return embed

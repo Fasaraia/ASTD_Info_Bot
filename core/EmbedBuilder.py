@@ -540,25 +540,60 @@ def build_cashboost_embed(cashboost: dict) -> discord.Embed:
     return embed
 
 
-def build_highest_dps_embed(data: dict) -> discord.Embed:
-    embed = discord.Embed(title="Highest DPS", color=DEFAULT_COLOR)
-    if data.get("raid_dps"):
-        embed.add_field(name="Raid DPS", value=data["raid_dps"], inline=False)
-    if data.get("max_dps"):
-        embed.add_field(name="Max DPS", value=data["max_dps"], inline=False)
-    if data.get("dot_dps"):
-        embed.add_field(name="DoT DPS", value=data["dot_dps"], inline=False)
-    if not embed.fields:
+def build_highest_dps_embed(
+    data: dict,
+    page: str = "raid"
+) -> discord.Embed:
+
+    embed = discord.Embed(
+        title="Highest DPS",
+        color=DEFAULT_COLOR
+    )
+
+    page_data = {
+        "raid": ("Raid DPS", "raid_dps"),
+        "max": ("Max DPS", "max_dps"),
+        "dot": ("DoT DPS", "dot_dps"),
+    }
+
+    field_name, data_key = page_data[page]
+
+    if data.get(data_key):
+        embed.add_field(
+            name=field_name,
+            value=data[data_key],
+            inline=False
+        )
+    else:
         embed.description = "No highest-DPS rankings on record yet."
+
     return embed
 
 
-def build_highest_nukes_embed(data: dict) -> discord.Embed:
-    embed = discord.Embed(title="Highest Nukes", color=DEFAULT_COLOR)
-    if data.get("raid"):
-        embed.add_field(name="Raid", value=data["raid"], inline=False)
-    if data.get("max"):
-        embed.add_field(name="Max", value=data["max"], inline=False)
-    if not embed.fields:
+def build_highest_nukes_embed(
+    data: dict,
+    page: str = "raid"
+) -> discord.Embed:
+
+    embed = discord.Embed(
+        title="Highest Nukes",
+        color=DEFAULT_COLOR
+    )
+
+    page_data = {
+        "raid": ("Raid", "raid"),
+        "max": ("Max", "max"),
+    }
+
+    field_name, data_key = page_data[page]
+
+    if data.get(data_key):
+        embed.add_field(
+            name=field_name,
+            value=data[data_key],
+            inline=False
+        )
+    else:
         embed.description = "No highest-nuke rankings on record yet."
+
     return embed

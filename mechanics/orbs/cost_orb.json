@@ -1,0 +1,9 @@
+{
+  "id": "cost_orb",
+  "name": "Cost Orb",
+  "description": "Reduces the initial cost of the Unit by $100.",
+  "obtain_method": "Trial 45 Extreme (100% Drop Rate)",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

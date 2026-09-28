@@ -1,0 +1,9 @@
+{
+  "id": "beast-m_scaling_orb",
+  "name": "Beast-M Scaling Orb",
+  "description": "Increases initial damage of Unit by +200%.\nIncreases upgrade damage of Unit by +250%.",
+  "obtain_method": "Trial 50 Extreme (100% Drop Rate)",
+  "unit_specific": "Mikato (Beast Cloak)",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

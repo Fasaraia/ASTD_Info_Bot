@@ -25,7 +25,7 @@ INITIAL_COGS = [
     "cogs.Mechanics",
     "cogs.ItemSearch",
     "cogs.Triggers",
-    # "cogs.misc",
+    "cogs.Misc",
 ]
 
 

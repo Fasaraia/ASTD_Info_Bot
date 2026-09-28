@@ -1,0 +1,9 @@
+{
+  "id": "bomba_orb",
+  "name": "Bomba Orb",
+  "description": "Increases initial damage of Unit by +30%.",
+  "obtain_method": "Trial 35 Extreme (100% Drop Rate)",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

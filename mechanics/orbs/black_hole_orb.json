@@ -1,0 +1,9 @@
+{
+  "id": "black_hole_orb",
+  "name": "Black Hole Orb",
+  "description": "Increases initial range of Unit by +20%.\nDecreases initial spa of Unit by 2 seconds.",
+  "obtain_method": "Random Boss Rush Raid (100% Drop Rate)",
+  "unit_specific": "Black Stache (Timeskip)",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

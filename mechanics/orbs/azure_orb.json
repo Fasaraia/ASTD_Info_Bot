@@ -1,0 +1,9 @@
+{
+  "id": "azure_orb",
+  "name": "Azure Orb",
+  "description": "Increases overall damage of Unit by +15%.",
+  "obtain_method": "Sijin Raid Extreme (100% Drop Rate)",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

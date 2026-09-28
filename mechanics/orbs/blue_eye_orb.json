@@ -1,0 +1,9 @@
+{
+  "id": "blue_eye_orb",
+  "name": "Blue Eye Orb",
+  "description": "Increases initial range of Unit by +30%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

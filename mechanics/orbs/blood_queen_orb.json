@@ -1,0 +1,9 @@
+{
+  "id": "blood_queen_orb",
+  "name": "Blood Queen Orb",
+  "description": "Unlocks Special Upgrades and BloodLust passive for Blood Queen (B-Kui).\n",
+  "obtain_method": "Beating Captains Zone (~15% Drop Rate)",
+  "unit_specific": "Blood Queen (B-Kui)",
+  "granted_ability": "BloodLust",
+  "image": "assets/placeholder.png"
+}

@@ -60,7 +60,6 @@ class TDSInfoBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True  
-        intents.members = True     
 
         super().__init__(command_prefix=Config.COMMAND_PREFIX, intents=intents)
         self.add_check(_channel_role_check)
@@ -73,9 +72,6 @@ class TDSInfoBot(commands.Bot):
             except Exception:
                 log.exception("Failed to load cog: %s", cog)
 
-        # Sync slash commands. If GUILD_ID is set, sync instantly to that
-        # test server (good for development). Otherwise sync globally,
-        # which can take up to an hour to propagate.
         if Config.GUILD_ID:
             guild = discord.Object(id=int(Config.GUILD_ID))
             self.tree.copy_global_to(guild=guild)

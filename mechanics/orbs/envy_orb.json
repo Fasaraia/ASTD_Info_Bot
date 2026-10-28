@@ -1,0 +1,9 @@
+{
+  "id": "envy_orb",
+  "name": "Envy Orb",
+  "description": "Initial damage of Unit is increased by +100%.\nInitial range of Unit is increased by +30%.",
+  "obtain_method": "Gauntlet Shop (50g)",
+  "unit_specific": ["Zero", "Zero (Daniel)"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

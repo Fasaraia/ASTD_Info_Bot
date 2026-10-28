@@ -1,0 +1,9 @@
+{
+  "id": "demon_m_orb",
+  "name": "Demon M Orb",
+  "description": "Increases initial damage of Unit by +500%.\nIncreases upgrade damage of Unit by +1000%.",
+  "obtain_method": "Craft at the Orb Shop",
+  "unit_specific": "Super Boo (Tokens)",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

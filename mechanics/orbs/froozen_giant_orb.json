@@ -1,0 +1,9 @@
+{
+  "id": "froozen_giant_orb",
+  "name": "Frozen Giant Orb",
+  "description": "Increases initial damage of Unit by +200%.\nIncreases upgrade damage of Unit by +500%.\nAdds Special Ability",
+  "obtain_method": "Trial 60 Extreme (20% Drop Rate)",
+  "unit_specific": "Nominated Female Giant",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

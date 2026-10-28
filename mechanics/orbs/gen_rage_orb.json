@@ -1,0 +1,9 @@
+{
+  "id": "gen_rage_orb",
+  "name": "Gen Rage Orb",
+  "description": "Increases initial range of Unit by +200%.\nIncreases upgrade damage of Unit by +300%.\nIncreases Cost by 1049%.",
+  "obtain_method": "Trial 150 Extreme (10% Drop Rate)",
+  "unit_specific": "Gen (Final)",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

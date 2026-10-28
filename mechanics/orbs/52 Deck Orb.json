@@ -1,0 +1,9 @@
+{
+  "id": "52_deck_orb",
+  "name": "52 Deck Orb",
+  "description": "Increases initial damage of Unit by +125%.\nIncreases upgrade damage of Unit by +445%.\nUnit now slows and bypasses elemental enemies",
+  "obtain_method": "Complete \"Ben & Jerry\" Unit Collection.",
+  "unit_specific": "Illusionist",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

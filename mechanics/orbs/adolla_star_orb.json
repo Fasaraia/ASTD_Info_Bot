@@ -1,0 +1,9 @@
+{
+  "id": "adolla_star_orb",
+  "name": "Adolla Star Orb",
+  "description": "Increases initial damage of Unit by +200%.\nIncreases upgrade damage of Unit by +1360%.\nUnit now stuns and is hybrid",
+  "obtain_method": "Complete \"We are... Burning Rangers\" Unit Collection.",
+  "unit_specific": "Pendragon",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "death_orb",
+  "name": "Death Orb",
+  "description": "Increases the damage of the Unit by +500%.\n",
+  "obtain_method": "Craft in Orb Shop",
+  "unit_specific": ["Kura (Darkness)", "Kura", "Kura (Origami)", "Death"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

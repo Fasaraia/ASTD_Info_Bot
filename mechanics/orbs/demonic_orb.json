@@ -1,0 +1,9 @@
+{
+  "id": "demonic_orb",
+  "name": "Demonic Orb",
+  "description": "Increases initial damage of Unit by +100%.\nIncreases upgrade damage of Unit by +225%.",
+  "obtain_method": "Craft at the Orb Shop",
+  "unit_specific": "Demon Spirit Detective",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

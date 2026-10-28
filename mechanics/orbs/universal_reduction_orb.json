@@ -1,0 +1,9 @@
+{
+  "id": "universal_reduction_orb",
+  "name": "Universal Reduction Orb",
+  "description": "Reduces overall cost by 15%.",
+  "obtain_method": "Trial 70 Extreme (20% Drop Rate)",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

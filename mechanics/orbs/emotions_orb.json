@@ -3,7 +3,7 @@
   "name": "Emotions Orb",
   "description": "Unlocks More Dragons Ability",
   "obtain_method": "Hunt on Blacksmith Raid (10% Drop Rate)",
-  "unit_specific": "Demon of Emotion",
+  "unit_specific": "demon_of_emotion",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

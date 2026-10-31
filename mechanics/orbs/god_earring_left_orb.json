@@ -1,0 +1,9 @@
+{
+  "id": "god_earring_left_orb",
+  "name": "God Earring Left Orb",
+  "description": "Unlocks Potara Fusion Ability.",
+  "obtain_method": "Craft at the Orb Shop.",
+  "unit_specific": ["koku", "winter_vegu", "super_koku", "ultra_koku", "koku_supa", "super_god_koku", "aqua_koku", "ganyu_july"],
+  "granted_ability": "Potara Fusion",
+  "image": "assets/placeholder.png"
+}

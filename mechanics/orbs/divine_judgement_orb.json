@@ -3,7 +3,7 @@
   "name": "Divine Judgement Orb",
   "description": "Increases initial damage of Unit by +100%.\nIncreases initial range of Unit by +30%.\nUnit is now Hybrid on placement\nChanges enemies enchant to dark.",
   "obtain_method": "Tier 3 & 4 Portals (75% Drop Rate)",
-  "unit_specific": "God Black Fusion",
+  "unit_specific": "god_black_fusion",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

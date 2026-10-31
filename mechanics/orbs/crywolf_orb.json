@@ -3,7 +3,7 @@
   "name": "Crywolf Orb",
   "description": "Increases the overall damage of the Unit by +1700%.",
   "obtain_method": "Craft in Orbs Shop",
-  "unit_specific": "Tony Stark",
+  "unit_specific": "tony_stark",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

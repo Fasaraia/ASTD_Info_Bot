@@ -3,7 +3,7 @@
   "name": "Dark Spiritual Orb",
   "description": "Increases the initial damage of the Unit by +200%.\nIncreases the upgrade damage of the Unit by +15%.\n\nThe unit can now hit air enemies.\n\nWhen the unit is max upgrade, Enemies hit by the unit are Slowed",
   "obtain_method": "Trial 100 (100% Drop Rate)",
-  "unit_specific": "Ikki (Dark)",
+  "unit_specific": "ikki_dark",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

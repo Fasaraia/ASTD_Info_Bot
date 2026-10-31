@@ -3,7 +3,7 @@
   "name": "Cartridged Daughter Orb",
   "description": "Unlocks Special Upgades",
   "obtain_method": "Craft at the Orb Shop.",
-  "unit_specific": "Abyss Researcher",
+  "unit_specific": "abyss_researcher",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

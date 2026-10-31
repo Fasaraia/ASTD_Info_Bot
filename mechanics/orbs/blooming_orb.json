@@ -3,7 +3,7 @@
   "name": "Blooming Orb",
   "description": "Increases initial damage of Unit by +800%.\nDecreases upgrade damage of Unit by +2000%.",
   "obtain_method": "Craft in Orbs Shop",
-  "unit_specific": "Zayaya",
+  "unit_specific": "zayaya",
   "granted_ability": null,
   "image": "assets/placeholder.png"
 }

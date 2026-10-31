@@ -1,0 +1,9 @@
+{
+  "id": "golden_f_scaling_orb_ii",
+  "name": "Golden-F Scaling Orb II",
+  "description": "Increases placement damage of Unit by +500%.\nIncreases damage of Unit by +3,220%.\nIncreases initial range of Unit by +100%.\nIncreases cost of Unit by +250%.\nGains Raging on Upgrade 8.",
+  "obtain_method": "Purchase from The Summer Heat Event Shop with 15,000 Summer Stones.",
+  "unit_specific": "golden_supreme_leader",
+  "granted_ability": "Raging",
+  "image": "assets/placeholder.png"
+}

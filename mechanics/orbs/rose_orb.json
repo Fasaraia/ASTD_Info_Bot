@@ -1,0 +1,9 @@
+{
+  "id": "rose_orb",
+  "name": "Rose Orb",
+  "description": "Increases initial damage of Unit by +500%.\nIncreases upgrade damage of Unit by +2000%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "koku_black_pink",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

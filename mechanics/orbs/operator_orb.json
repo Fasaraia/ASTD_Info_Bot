@@ -1,0 +1,9 @@
+{
+  "id": "operator_orb",
+  "name": "Operator Orb",
+  "description": "Replacement-Skill can teleport 8 more enemies.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "dr_heart",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

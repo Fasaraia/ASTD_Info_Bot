@@ -1,0 +1,9 @@
+{
+  "id": "moon_orb",
+  "name": "Moon Orb",
+  "description": "Grants Moon Transformation to Unit.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "koku_alternative",
+  "granted_ability": "Moon Transformation",
+  "image": "assets/placeholder.png"
+}

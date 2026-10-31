@@ -1,0 +1,9 @@
+{
+  "id": "water_orb",
+  "name": "Water Orb",
+  "description": "Adds Water Damage to Unit, which scales with Upgrades.\nDisabled in Infinite Mode.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

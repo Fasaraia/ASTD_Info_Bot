@@ -1,0 +1,9 @@
+{
+  "id": "limitation_orb",
+  "name": "Limitation Orb",
+  "description": "Increases initial damage of Unit by +700%.\nIncreases upgrade damage of Unit by +1600%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "gen_grown",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

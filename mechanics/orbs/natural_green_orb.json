@@ -1,0 +1,9 @@
+{
+  "id": "green_natural_orb",
+  "name": "Green Natural Orb",
+  "description": "Increases damage of Unit by +2350%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "legendary_borul",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

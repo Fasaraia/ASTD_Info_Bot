@@ -1,0 +1,9 @@
+{
+  "id": "snow_orb",
+  "name": "Snow Orb",
+  "description": "Increases initial damage of Unit by +200%.\nIncreases upgrade damage of Unit by +1,000%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": ["ice_queen_b", "ice_queen_d"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

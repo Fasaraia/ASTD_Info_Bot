@@ -1,0 +1,9 @@
+{
+  "id": "pink_star_orb",
+  "name": "Pink Star Orb",
+  "description": "Increases damage of Unit by +200%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "star_boy_requiem",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

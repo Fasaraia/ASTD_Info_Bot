@@ -1,0 +1,9 @@
+{
+  "id": "supa_future_orb",
+  "name": "Supa Future Orb",
+  "description": "Increases damage of Unit by +350%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "supa_future_t",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

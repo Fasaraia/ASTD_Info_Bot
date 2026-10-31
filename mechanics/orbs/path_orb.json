@@ -1,0 +1,9 @@
+{
+  "id": "path_orb",
+  "name": "Path Orb",
+  "description": "Increases initial damage of Unit by +100%.\nIncreases upgrade damage of Unit by +100%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": ["the_path", "the_path_final"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "venomous_orb",
+  "name": "Venomous Orb",
+  "description": "Increases damage of Unit by +500%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": ["venom", "venom_demon"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

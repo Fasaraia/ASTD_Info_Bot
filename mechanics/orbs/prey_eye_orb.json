@@ -1,0 +1,9 @@
+{
+  "id": "prey_eye_orb",
+  "name": "Prey Eye Orb",
+  "description": "Increases initial range of Unit by +10%.\nDecreases cost of Unit by -50.\nIncreases initial damage of Unit by +15%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

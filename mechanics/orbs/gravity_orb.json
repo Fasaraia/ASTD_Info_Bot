@@ -1,0 +1,9 @@
+{
+  "id": "gravity_orb",
+  "name": "Gravity Orb",
+  "description": "Increases initial damage of Unit by +2000%.\nIncreases upgrade damage of Unit by +2500%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "blinding_lights",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

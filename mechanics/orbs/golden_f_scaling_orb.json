@@ -1,0 +1,9 @@
+{
+  "id": "golden_f_scaling_orb",
+  "name": "Golden-F Scaling Orb",
+  "description": "Increases initial damage of Unit by +200%.\nIncreases upgrade damage of Unit by +100%.",
+  "obtain_method": "Beat Trial Level REQ: 25 on Extreme Mode.",
+  "unit_specific": "golden_supreme_leader",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "super_blue_eye_orb",
+  "name": "Super Blue Eye Orb",
+  "description": "Increases initial range of Unit by +40%.",
+  "obtain_method": "Prestige (Wishing for Relics)",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

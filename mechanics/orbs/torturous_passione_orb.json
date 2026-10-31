@@ -1,0 +1,9 @@
+{
+  "id": "torturous_passione_orb",
+  "name": "Torturous Passione Orb",
+  "description": "Increases all damage of Unit by +270%.\nGains Burn on Last Upgrade.",
+  "obtain_method": "Complete \"Verdant Wind\" Unit Collection.",
+  "unit_specific": "lil_bomber",
+  "granted_ability": "Burn",
+  "image": "assets/placeholder.png"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "ultra_magic_orb",
+  "name": "Ultra Magic Orb",
+  "description": "Increases initial range of Unit by +20%.\nIncreases overall damage of Unit by +5%.\nDecreases overall cost of Unit by -7%.",
+  "obtain_method": "Beat Random Boss Rush 2 Raid.",
+  "unit_specific": null,
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

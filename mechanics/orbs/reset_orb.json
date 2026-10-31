@@ -1,0 +1,9 @@
+{
+  "id": "reset_orb",
+  "name": "Reset Orb",
+  "description": "Adds an additional upgrade to Unit.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "yoshaga_kiryu_eat_the_dirt",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

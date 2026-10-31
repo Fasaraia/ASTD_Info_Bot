@@ -1,0 +1,9 @@
+{
+  "id": "paw_orb",
+  "name": "Paw Orb",
+  "description": "Increases initial damage of Unit by +1250%.\nIncreases upgrade damage of Unit by +600%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": ["tyrant", "tyrant_furious"],
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}

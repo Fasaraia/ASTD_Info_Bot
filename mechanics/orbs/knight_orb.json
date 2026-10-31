@@ -1,0 +1,9 @@
+{
+  "id": "knight_orb",
+  "name": "Knight Orb",
+  "description": "Increases all damage of Unit by +100%.\nGains Critical Mechanic and Yellow Enchant.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "meta_knight",
+  "granted_ability": "Critical Mechanic, Yellow Enchant",
+  "image": "assets/placeholder.png"
+}

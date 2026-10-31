@@ -1,0 +1,9 @@
+{
+  "id": "snake_orb",
+  "name": "Snake Orb",
+  "description": "Increases initial damage of Unit by +100%.\nIncreases upgrade damage of Unit by +100%.",
+  "obtain_method": "Craft in Orbs Shop",
+  "unit_specific": "ruffy_snake_sss",
+  "granted_ability": null,
+  "image": "assets/placeholder.png"
+}
